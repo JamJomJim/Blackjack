@@ -46,7 +46,7 @@ class Dealer:
             print("Dealer has [" + str(self.hand[0]) + ", unknown]")
 
     def deal(self, person, number):
-        person.hand = self.deck1.hand[0:number]
+        person.hand += self.deck1.hand[0:number]
         self.deck1.hand = self.deck1.hand[number:]
 
 
@@ -59,8 +59,10 @@ class Player:
 
     def stand(self):
         temp = 1
-    def hit(self):
-        temp = 1
+
+    def hit(self, dealer):
+        dealer.deal(self, 1)
+
     def double(self):
         temp = 1
     def split(self):
@@ -70,24 +72,40 @@ class Player:
 def check_value(hand):
     hand_sum = 0
     for i in range(len(hand)):
-        if hand[i].rank is "ace":
+        if hand[i].rank == "ace":
             hand_sum += 11
         else:
             hand_sum += hand[i].rank
-        if hand[i].rank is "ace" and hand_sum > 21:
+        if hand[i].rank == "ace" and hand_sum > 21:
             hand_sum -= 10
-    print(hand_sum)
     return hand_sum
 
-dealer = Dealer()
-player = Player()
-dealer.deal(player, 2)
-dealer.deal(dealer, 2)
-print(player.hand)
-check_value(player.hand)
+def main():
+    dealer = Dealer()
+    player = Player()
+    dealer.deal(player, 2)
+    dealer.deal(dealer, 2)
+    dealer.displaycards(1)
+    player.displaycards()
+    if check_value(player.hand) == 21:
+        print("Blackjack!")
+    else:
+        over = False
+        while not over:
+            player_hand_value = check_value(player.hand)
+            if  player_hand_value == 21:
+                print("Blackjack")
+            elif player_hand_value > 21:
+                print("Bust")
+            else:
+                move = input("Hit or Stand?")
+                if move == "stand":
+                    player.stand()
+                    player.displaycards()
+                elif move == "hit":
+                    player.hit(dealer)
+                    player.displaycards()
 
 
-
-
-
-
+if __name__ == '__main__':
+    main()
