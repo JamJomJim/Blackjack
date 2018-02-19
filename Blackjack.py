@@ -136,7 +136,7 @@ def main():
     #dealer moves
     if dealer_hand_val == 21:
         print("Dealer Blackjack!")
-        #exit() shouldn't mess things up, but keep this in mind, might break out of the entire program i can't remember
+        #exit() shouldn't mess things up, but keep this in mind, might quit program
     else:
         over = False
         print("Dealer has", dealer_hand_val)
