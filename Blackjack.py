@@ -3,7 +3,7 @@ suits, ranks = ["hearts", "diamonds", "spades", "clubs"], [2, 3, 4, 5, 6, 7, 8, 
 
 blackjack_payout = 1.5
 dealer_hit_soft17 = True
-number_of_decks = 1
+number_of_decks = 2
 
 
 class Card:
@@ -24,7 +24,7 @@ class Card:
 class Deck:
     def __init__(self):
         self.cards = []
-        for i in range(number_of_decks):
+        for _ in range(number_of_decks):
             for suit in suits:
                 for rank in ranks:
                     self.cards.append(Card(suit, rank))
@@ -195,6 +195,7 @@ def main():
         print("Player wins!")
     else:
         print("Push")
+
 
 if __name__ == '__main__':
     main()
