@@ -1,10 +1,11 @@
 import random
-#NOTE cards in the deck are going to have to be removed from play eventually and somehow
-#NOTE I'm also assuming that there are going to be multiple player objects?
-suits, ranks = {"hearts", "diamonds", "spades", "clubs"}, {2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, "ace"}
+suits, ranks = ["hearts", "diamonds", "spades", "clubs"], [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, "ace"]
 
-blackjackpayout = 1.5
-dealerhitsoft17 = True #note depends
+blackjack_payout = 1.5
+dealer_hit_soft17 = True
+number_of_decks = 1
+
+
 class Card:
     def __init__(self, suit, rank):
         self.suit = suit
@@ -22,24 +23,23 @@ class Card:
 
 class Deck:
     def __init__(self):
-        self.hand = []
-        for suit in suits:
-            for rank in ranks:
-                self.hand.append(Card(suit, rank))
+        self.cards = []
+        for i in range(number_of_decks):
+            for suit in suits:
+                for rank in ranks:
+                    self.cards.append(Card(suit, rank))
 
-    def displaycards(self):
-        print(self.hand)
+    def display_cards(self):
+        print(self.cards)
 
     def shuffle(self):
-        random.shuffle(self.hand)
+        random.shuffle(self.cards)
 
 
 class Dealer:
-    #I think we need a pointer that lets us know where in the deck we are, or a discard played card function
     def __init__(self):
-        self.deck1 = Deck()
-        self.deck1.shuffle()
-        #NOTE I'm assuming that they're named "1" and stuff because we can set a value to determine the number of total decks that the dealer can have?
+        self.deck = Deck()
+        self.deck.shuffle()
         self.hand = []
 
     def displaycards(self, start=None):
@@ -49,15 +49,15 @@ class Dealer:
             print("Dealer has [" + str(self.hand[0]) + ", unknown]")
 
     def deal(self, person, numcards):
-        #noTE maybe lets not do this 0-indexed, although thats just a sematic thing
-        #NOTE I'm pretty sure this will keep picking the same cards over and over
-        person.hand += self.deck1.hand[0:numcards]
-        #adds the next set of cards to the dealers hand, NOTE shouldn't it deal sequentially? not all at once, does that even matter?
-        self.deck1.hand = self.deck1.hand[numcards:]
+        person.hand += self.deck.cards[0:numcards]
+        self.deck.cards = self.deck.cards[numcards:]
+
     def hit(self, dealer):
         dealer.deal(self, 1)
+
     def stand(self):
         pass
+
 
 class Player:
     def __init__(self):
@@ -67,109 +67,131 @@ class Player:
 
     def displaycards(self):
         print("Player has", self.hand)
-#FIXME the passed functions
+# FIXME the passed functions
+
     def stand(self):
         pass
+
     def hit(self, dealer):
         dealer.deal(self, 1)
+
     def double(self):
         pass
+
     def split(self):
         pass
+
     def surrender(self):
         pass
 
+
 def check_value(hand):
-    #TODO how to handle doubles
-    hand_sum = 0
+    possible_values = [0]
+    # this essentially sets up a binomial tree with all the possible values.
     for card in hand:
         if card.rank == "ace":
-            hand_sum += 11
+            temp_values = list(possible_values)
+            for value in possible_values:
+                temp_values.append(value + 1)
+                temp_values.append(value + 11)
+                temp_values.remove(value)
+            possible_values = temp_values
         else:
-            hand_sum += card.rank
+            for i, value in enumerate(possible_values):
+                possible_values[i] += card.rank
+    # lambda sets up an anonymous function that returns a bool.
+    # filter returns the values in possible_values that satisfy this function.
+    # these values are then turned into a list, and possible_values is set to that list.
+    possible_values = list(filter(lambda hand_value: hand_value <= 21, possible_values))
+    # the highest valid hand value is then returned.
+    # if the player is bust, return -1.
+    return max(possible_values + [-1])
 
-        if card.rank == "ace" and hand_sum > 21:
-            hand_sum -= 10
-    return hand_sum
 
 def main():
+
+    # keep in mind that all of these prints will be deleted eventually.
+
     dealer = Dealer()
     player = Player()
+
     dealer.deal(player, 2)
     dealer.deal(dealer, 2)
+
     dealer.displaycards(1)
     player.displaycards()
-    player_hand_val = check_value(player.hand)
-    dealer_hand_val = check_value(dealer.hand)
 
-    #player moves
+    dealer_hand_val = check_value(dealer.hand)
+    player_hand_val = check_value(player.hand)
+    # test for card values
+    # print(check_value([Card("hearts", "ace"), Card("hearts", 9), Card("hearts", "ace"), Card("hearts", "ace")]))
+    # player moves
+    over = False
     if player_hand_val == 21:
         print("Player Blackjack!")
-    else:
-        over = False
-        while not over:
-            player_hand_val = check_value(player.hand)
+        over = True
+    while not over:
+        player_hand_val = check_value(player.hand)
+        print("Player points", player_hand_val)
+        if player_hand_val == 21:
+            print("Player Lesser Blackjack!")
+            over = True
+        elif player_hand_val == -1 or player_hand_val > 21:
+            print("Player Bust")
+            over = True
             print("Player points", player_hand_val)
-            if player_hand_val == 21:
-                print("Player Lesser Blackjack!")
+        else:
+            move = input("Hit or Stand?")
+            if move == "stand":
+                player.stand()
+                player.displaycards()
                 over = True
-            elif player_hand_val > 21:
-                print("Player Bust")
-                over = True
-                print("Player points", player_hand_val)
-            else:
-                move = input("Hit or Stand?")
-                if move == "stand":
-                    player.stand()
-                    player.displaycards()
-                    over = True
-                elif move == "hit":
-                    player.hit(dealer)
-                    player.displaycards()
-                elif move == "split":
-                    pass
-                elif move == "double":
-                    pass
-                elif move == "surrender":
-                    pass
+            elif move == "hit":
+                player.hit(dealer)
+                player.displaycards()
+            elif move == "split":
+                pass
+            elif move == "double":
+                pass
+            elif move == "surrender":
+                pass
 
-    #dealer moves
+    # dealer moves
+    over = False
     if dealer_hand_val == 21:
         print("Dealer Blackjack!")
-        #exit() shouldn't mess things up, but keep this in mind, might quit program
-    else:
-        over = False
-        print("Dealer has", dealer_hand_val)
-        while not over:
-            dealer_hand_val = check_value(dealer.hand)
-            print("Dealer hand", dealer.hand)
-        # print("Dealer points", dealer_hand_val)
-            if dealer_hand_val == 21:
-                print("Dealer Lesser Blackjack!")
-                over = True
-            elif dealer_hand_val > 21:
-                print("Dealer Bust with", dealer_hand_val)
-                over = True
+        over = True
+    print("Dealer has", check_value(dealer.hand))
+    while not over:
+        dealer_hand_val = check_value(dealer.hand)
+        print("Dealer hand", dealer.hand)
+    # print("Dealer points", dealer_hand_val)
+        if dealer_hand_val == 21:
+            print("Dealer Lesser Blackjack!")
+            over = True
+        elif dealer_hand_val > 21:
+            print("Dealer Bust with", dealer_hand_val)
+            over = True
+        else:
+            # if the dealer hits on a soft17 or whatever
+            if dealer_hand_val == 17 and "ace" in dealer.hand and dealer_hit_soft17:
+                move = "hit"
+            elif 1 < dealer_hand_val < 16:
+                move = "hit"
             else:
-                #if the dealer hits on a soft17 or whatever
-                if dealer_hand_val == 17 and "ace" in dealer.hand and dealerhitsoft17:
-                    move = "hit"
-                elif 1 < dealer_hand_val < 16:
-                    move = "hit"
-                else:
-                    move = "stand"
+                move = "stand"
 
-                if move == "stand":
-                    dealer.stand()
-                    over = True
-                    print("Dealer points", dealer_hand_val)
-                elif move == "hit":
-                    dealer.hit(dealer)
-                    print("Dealer points", dealer_hand_val)
+            if move == "stand":
+                dealer.stand()
+                over = True
+                print("Dealer points", dealer_hand_val)
+            elif move == "hit":
+                dealer.hit(dealer)
+                print("Dealer points", dealer_hand_val)
         dealer.displaycards(None)
-    if dealer_hand_val > player_hand_val and dealer_hand_val <= 21:
+    if 21 >= dealer_hand_val > player_hand_val:
         print("Dealer wins!")
-    elif dealer_hand_val < player_hand_val and player_hand_val <= 21:
+    elif dealer_hand_val < player_hand_val <= 21:
         print("Player wins!")
     else:
         print("Push")
