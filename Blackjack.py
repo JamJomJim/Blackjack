@@ -12,6 +12,8 @@ blackjack_payout = 1.5
 dealer_hit_soft17 = True
 number_of_decks = 6
 penetration = 0.5
+
+#this could be used for statistics
 current_penetration = 0
 
 
