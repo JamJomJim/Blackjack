@@ -3,7 +3,8 @@ suits, ranks = ["hearts", "diamonds", "spades", "clubs"], [2, 3, 4, 5, 6, 7, 8, 
 
 blackjack_payout = 1.5
 dealer_hit_soft17 = True
-number_of_decks = 1
+number_of_decks = 6
+penetration = .5
 
 
 class Card:
@@ -38,8 +39,8 @@ class Deck:
 
 class Dealer:
     def __init__(self):
-        self.deck = Deck()
-        self.deck.shuffle()
+        self.deck = None
+        self.new_deck()
         self.hand = []
 
     def displaycards(self, start=None):
@@ -52,20 +53,18 @@ class Dealer:
         person.hand += self.deck.cards[0:numcards]
         self.deck.cards = self.deck.cards[numcards:]
 
-    def hascards(self):
-        if len(self.deck.cards) >= 10:
-            return True
-        else:
-            return False
-
     def hit(self, dealer):
         dealer.deal(self, 1)
 
     def stand(self):
         pass
 
-    def clearhand(self):
+    def clear_hand(self):
         self.hand = []
+
+    def new_deck(self):
+        self.deck = Deck()
+        self.deck.shuffle()
 
 
 class Player:
@@ -92,7 +91,8 @@ class Player:
 
     def surrender(self):
         pass
-    def clearhand(self):
+
+    def clear_hand(self):
         self.hand = []
 
 
@@ -125,8 +125,7 @@ def main():
 
     dealer = Dealer()
     player = Player()
-    while dealer.hascards():
-
+    while True:
         dealer.deal(player, 2)
         dealer.deal(dealer, 2)
 
@@ -155,7 +154,7 @@ def main():
                 print("Player has a", player_hand_val)
                 move = input("Hit or Stand?\n")
                 if move == "stand":
-                    player.stand() #i don't think this line is neccesary
+                    player.stand()  # i don't think this line is necessary
                     player.displaycards()
                     print("Player stands with", player_hand_val)
                     over = True
@@ -199,7 +198,7 @@ def main():
                     dealer.stand()
                     over = True
                     print("Dealer stands with", dealer_hand_val)
-                elif move == "hit" and dealer.hascards():
+                elif move == "hit":
                     dealer.hit(dealer)
                     print("Dealer hits to make", dealer_hand_val)
                 else:
@@ -213,9 +212,11 @@ def main():
         else:
             print("Push\n")
 
-        player.clearhand()
-        dealer.clearhand()
-    print("Empty deck.")
+        player.clear_hand()
+        dealer.clear_hand()
+        if len(dealer.deck.cards) / (number_of_decks * 52) < (1 - penetration):
+            print("New Deck!")
+            dealer.new_deck()
 
 
 if __name__ == '__main__':
