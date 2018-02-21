@@ -303,7 +303,7 @@ def main():
         if len(dealer.deck.cards) / (number_of_decks * 52) < (1 - penetration):
             print("New Deck!")
             dealer.new_deck()
-            #resetting counts and such
+            #resetting counts and suc
             player.running_count, player.true_count, player.cards_seen, player.decks_remaining \
                 = 0, 0, 0, number_of_decks
 
