@@ -287,7 +287,7 @@ def main():
         else:
             print("Push\n")
 
-        #need to have the special payout for hitting a blackjack off the bat, maybe a flag in the manipulate function.
+        #need to have the special payout for hitting a blackjack off the bat, maybe a flag in the manipulate function
         player.count(dealer.hand, player.hand)
         player.update_decks_remaining()
         player.choose_bet()
