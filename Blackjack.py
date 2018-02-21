@@ -3,7 +3,7 @@ suits, ranks = ["hearts", "diamonds", "spades", "clubs"], [2, 3, 4, 5, 6, 7, 8, 
 
 blackjack_payout = 1.5
 dealer_hit_soft17 = True
-number_of_decks = 2
+number_of_decks = 1
 
 
 class Card:
@@ -52,11 +52,20 @@ class Dealer:
         person.hand += self.deck.cards[0:numcards]
         self.deck.cards = self.deck.cards[numcards:]
 
+    def hascards(self):
+        if len(self.deck.cards) >= 10:
+            return True
+        else:
+            return False
+
     def hit(self, dealer):
         dealer.deal(self, 1)
 
     def stand(self):
         pass
+
+    def clearhand(self):
+        self.hand = []
 
 
 class Player:
@@ -83,6 +92,8 @@ class Player:
 
     def surrender(self):
         pass
+    def clearhand(self):
+        self.hand = []
 
 
 def check_value(hand):
@@ -114,87 +125,97 @@ def main():
 
     dealer = Dealer()
     player = Player()
+    while dealer.hascards():
 
-    dealer.deal(player, 2)
-    dealer.deal(dealer, 2)
+        dealer.deal(player, 2)
+        dealer.deal(dealer, 2)
 
-    dealer.displaycards(1)
-    player.displaycards()
+        dealer.displaycards(1)
+        player.displaycards()
 
-    dealer_hand_val = check_value(dealer.hand)
-    player_hand_val = check_value(player.hand)
+        dealer_hand_val = check_value(dealer.hand)
+        player_hand_val = check_value(player.hand)
     # test for card values
     # print(check_value([Card("hearts", "ace"), Card("hearts", 9), Card("hearts", "ace"), Card("hearts", "ace")]))
     # player moves
-    over = False
-    if player_hand_val == 21:
-        print("Player Blackjack!")
-        over = True
-    while not over:
-        player_hand_val = check_value(player.hand)
-        print("Player points", player_hand_val)
+
+        over = False
         if player_hand_val == 21:
-            print("Player Lesser Blackjack!")
+            print("Player Blackjack!")
             over = True
-        elif player_hand_val == -1 or player_hand_val > 21:
-            print("Player Bust")
-            over = True
-            print("Player points", player_hand_val)
-        else:
-            move = input("Hit or Stand?")
-            if move == "stand":
-                player.stand()
-                player.displaycards()
+        while not over:
+            player_hand_val = check_value(player.hand)
+            if player_hand_val == 21:
+                print("Player Lesser Blackjack!")
                 over = True
-            elif move == "hit":
-                player.hit(dealer)
-                player.displaycards()
-            elif move == "split":
-                pass
-            elif move == "double":
-                pass
-            elif move == "surrender":
-                pass
-
-    # dealer moves
-    over = False
-    if dealer_hand_val == 21:
-        print("Dealer Blackjack!")
-        over = True
-    print("Dealer has", check_value(dealer.hand))
-    while not over:
-        dealer_hand_val = check_value(dealer.hand)
-        print("Dealer hand", dealer.hand)
-    # print("Dealer points", dealer_hand_val)
-        if dealer_hand_val == 21:
-            print("Dealer Lesser Blackjack!")
-            over = True
-        elif dealer_hand_val > 21:
-            print("Dealer Bust with", dealer_hand_val)
-            over = True
-        else:
-            # if the dealer hits on a soft17 or whatever
-            if dealer_hand_val == 17 and "ace" in dealer.hand and dealer_hit_soft17:
-                move = "hit"
-            elif 1 < dealer_hand_val < 16:
-                move = "hit"
+            elif player_hand_val == -1 or player_hand_val > 21:
+                print("Player Bust")
+                over = True
             else:
-                move = "stand"
+                print("Player has a", player_hand_val)
+                move = input("Hit or Stand?\n")
+                if move == "stand":
+                    player.stand() #i don't think this line is neccesary
+                    player.displaycards()
+                    print("Player stands with", player_hand_val)
+                    over = True
+                elif move == "hit":
+                    player.hit(dealer)
+                    print("Player hits.")
+                    player.displaycards()
+                elif move == "split":
+                    pass
+                elif move == "double":
+                    pass
+                elif move == "surrender":
+                    pass
 
-            if move == "stand":
-                dealer.stand()
+        # dealer moves
+        over = False
+        if dealer_hand_val == 21:
+            print("Dealer Blackjack!")
+            over = True
+
+        while not over:
+            dealer_hand_val = check_value(dealer.hand)
+            print("Dealer hand: ", dealer.hand)
+
+            if dealer_hand_val == 21:
+                print("Dealer Lesser Blackjack!")
                 over = True
-                print("Dealer points", dealer_hand_val)
-            elif move == "hit":
-                dealer.hit(dealer)
-                print("Dealer points", dealer_hand_val)
-        dealer.displaycards(None)
-    if 21 >= dealer_hand_val > player_hand_val:
-        print("Dealer wins!")
-    elif dealer_hand_val < player_hand_val <= 21:
-        print("Player wins!")
-    else:
-        print("Push")
+            elif dealer_hand_val > 21 or dealer_hand_val == -1:
+                print("Dealer busts with", dealer_hand_val)
+                over = True
+            else:
+                #  if the dealer hits on a soft17 or whatever, didn't hit on soft 17
+                if dealer_hand_val == 17 and "ace" in dealer.hand and dealer_hit_soft17:
+                    move = "hit"
+                elif 1 < dealer_hand_val < 16:
+                    move = "hit"
+                else:
+                    move = "stand"
+
+                if move == "stand":
+                    dealer.stand()
+                    over = True
+                    print("Dealer stands with", dealer_hand_val)
+                elif move == "hit" and dealer.hascards():
+                    dealer.hit(dealer)
+                    print("Dealer hits to make", dealer_hand_val)
+                else:
+                    print("Empty deck! Dealer has", dealer_hand_val)
+                    over = True
+
+        if 21 >= dealer_hand_val > player_hand_val:
+            print("Dealer wins!\n")
+        elif dealer_hand_val < player_hand_val <= 21:
+            print("Player wins!\n")
+        else:
+            print("Push\n")
+
+        player.clearhand()
+        dealer.clearhand()
+    print("Empty deck.")
 
 
 if __name__ == '__main__':
