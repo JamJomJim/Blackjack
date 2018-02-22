@@ -1,19 +1,279 @@
 import random
 import math
+import numpy
 
-#getters and setters would make things look nicer, just a refactoring thing, also its more proper
-#fix bets so that they're respond dynamically to counts
-#we could make count values an attribute of a card
-#how aggressive the bets are flag
+# getters and setters would make things look nicer, just a refactoring thing, also its more proper
+# fix bets so that they're respond dynamically to counts
+# we could make count values an attribute of a card
+# how aggressive the bets are flag
+# have it autoplay - for now have it just hit or something, following BS can come later.
+# add in basic strategy
+
+
+# surrender > split > double > hit > stand
 
 suits, ranks = ["hearts", "diamonds", "spades", "clubs"], [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, "ace"]
+# player 5-17 in hard totals
+hard_hand_strategy = \
+[
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+[
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+[
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+[
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+[
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+[
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+[
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']]]
+
+# player 8 for soft totals
+soft_hand_strategy = \
+[
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']]]
+
+
+# player 10 for splitting
+splitting_hand_strategy = \
+[
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
+ [
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
+  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']]]
+
+
 
 blackjack_payout = 1.5
 dealer_hit_soft17 = True
+surrender = True
+insurance = True
 number_of_decks = 6
 penetration = 0.5
 
-#this could be used for statistics
+# this could be used for statistics
 current_penetration = 0
 
 
@@ -156,6 +416,7 @@ class Player:
                     self.running_count -= 1
             else:
                 self.running_count -= 1
+
         self.true_count = math.floor(self.running_count / self.decks_remaining) # or a different rounding method
 
     def place_bet(self):
@@ -177,7 +438,6 @@ class Player:
 
     def see_card(self, cards_seen):
         self.cards_seen += cards_seen
-
 
 
 def main():
@@ -233,9 +493,10 @@ def main():
                     player.see_card(2)
                     pass
                 elif move == "double":
-                    player.see_card(1)
+                    player.double()
                     pass
                 elif move == "surrender":
+                    player.surrender()
                     pass
 
         # dealer moves
@@ -255,9 +516,9 @@ def main():
                 print("Dealer busts with", dealer_hand_val)
                 over = True
             else:
-                #  if the dealer hits on a soft17 or whatever, this is searching for a card instead of a rank
+                # if the dealer hits on a soft17 or whatever, this is searching for a card instead of a rank
                 # if dealer_hand_val == 17 and dealer.hand.("ace") and dealer_hit_soft17:
-                #     move = "hit"
+                # move = "hit"
                 if 1 < dealer_hand_val < 16:
                     move = "hit"
                 else:
@@ -276,7 +537,7 @@ def main():
                 else:
                     print("Empty deck! Dealer has", dealer_hand_val)
                     over = True
-        #how does this handle busting when values are -1?
+        # how does this handle busting when values are -1?
         if 21 >= dealer_hand_val > player_hand_val:
             print("Dealer wins!\n")
             bet *= -1
@@ -289,7 +550,7 @@ def main():
         else:
             print("Push\n")
 
-        #need to have the special payout for hitting a blackjack off the bat, maybe a flag in the manipulate function
+        # need to have the special payout for hitting a blackjack off the bat, maybe a flag in the manipulate function
         player.count(dealer.hand, player.hand)
         player.update_decks_remaining()
         player.choose_bet()
@@ -301,11 +562,10 @@ def main():
         player.show_bankroll()
         print(player.running_count, player.true_count)
 
-
         if len(dealer.deck.cards) / (number_of_decks * 52) < (1 - penetration):
             print("New Deck!")
             dealer.new_deck()
-            #resetting counts and such
+            # resetting counts and such
             player.running_count, player.true_count, player.cards_seen, player.decks_remaining \
                 = 0, 0, 0, number_of_decks
 
