@@ -265,16 +265,38 @@ splitting_hand_strategy = \
   ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']]]
 
 
+class Game:
+    def __init__(self, blackjack_payout, dealer_hit_soft17, surrender, insurance, number_of_decks, penetration):
+        self.blackjack_payout = blackjack_payout
+        self.dealer_hit_soft17 = dealer_hit_soft17
+        self.surrender = surrender
+        self.insurance = insurance
+        self.number_of_decks = number_of_decks
+        self.penetration = penetration
+        self.round = 0
 
-blackjack_payout = 1.5
-dealer_hit_soft17 = True
-surrender = True
-insurance = True
-number_of_decks = 6
-penetration = 0.5
 
-# this could be used for statistics
-current_penetration = 0
+class Model:
+    def __init__(self, starting_amount, rounds_to_be_played, is_manual):
+        self.starting_amount = starting_amount
+        self.rounds_to_be_played = rounds_to_be_played
+        self.is_manual = is_manual
+
+
+class Shoe:
+    def __init__(self, dealer, game):
+        self.cards_seen = 0
+        self.running_count = 0
+        self.true_count = 0
+        dealer.new_decks(game)
+
+
+def find_best_move(player_value, dealer_value):
+    strat = hard_hand_strategy[player_value][dealer_value][true_count]
+    if strat != "None":
+        return strat
+    else:
+        return "hit"
 
 
 def check_value(hand):
@@ -300,6 +322,28 @@ def check_value(hand):
     return max(possible_values + [-1])
 
 
+def count(dealer_hand, player_hand, shoe, game):
+
+    # this needs to be changed to work after every card dealt instead of a game to game basis
+
+    temp_hand = dealer_hand + player_hand
+
+    for card in temp_hand:
+        if card.rank != "ace":
+            if 2 <= int(card.rank) <= 6:
+                shoe.running_count += 1
+
+            elif 7 <= int(card.rank) <= 9:
+                shoe.running_count += 0
+
+            else:
+                shoe.running_count -= 1
+        else:
+            shoe.running_count -= 1
+
+    shoe.true_count = math.floor(shoe.running_count / (game.number_of_decks * 52 - shoe.cards_seen))
+
+
 class Card:
     def __init__(self, suit, rank):
         self.suit = suit
@@ -316,9 +360,9 @@ class Card:
 
 
 class Deck:
-    def __init__(self):
+    def __init__(self, game):
         self.cards = []
-        for _ in range(number_of_decks):
+        for _ in range(game.number_of_decks):
             for suit in suits:
                 for rank in ranks:
                     self.cards.append(Card(suit, rank))
@@ -333,7 +377,6 @@ class Deck:
 class Dealer:
     def __init__(self):
         self.deck = None
-        self.new_deck()
         self.hand = []
 
     def displaycards(self, start=None):
@@ -356,29 +399,19 @@ class Dealer:
     def clear_hand(self):
         self.hand = []
 
-    def new_deck(self):
-        self.deck = Deck()
+    def new_decks(self, game):
+        self.deck = Deck(game)
         self.deck.shuffle()
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, model):
         self.hand = []
-        self.bankroll = 200
+        self.bankroll = model.starting_amount
         self.bet = 5
-
-        self.cards_seen = 0
-        self.decks_remaining = number_of_decks
-        self.running_count = 0
-        self.true_count = 0
 
     def displaycards(self):
         print("Player has", self.hand)
-# FIXME the passed functions
-
-    def update_decks_remaining(self):
-        self.decks_remaining = (math.floor((52 * number_of_decks - self.cards_seen)/52) +
-            math.ceil((52 * number_of_decks - self.cards_seen)/52))/2
 
     def stand(self):
         pass
@@ -398,27 +431,6 @@ class Player:
     def clear_hand(self):
         self.hand = []
 
-    def count(self, dealer_hand, player_hand):
-
-        #this needs to be changed to work after every card dealt instead of a game to game basis
-
-        temp_hand = dealer_hand + player_hand
-
-        for card in temp_hand:
-            if card.rank != "ace":
-                if 2 <= int(card.rank) <= 6:
-                    self.running_count += 1
-
-                elif 7 <= int(card.rank) <= 9:
-                    self.running_count += 0
-
-                else:
-                    self.running_count -= 1
-            else:
-                self.running_count -= 1
-
-        self.true_count = math.floor(self.running_count / self.decks_remaining) # or a different rounding method
-
     def place_bet(self):
         self.bankroll -= self.bet
         return self.bet
@@ -427,7 +439,7 @@ class Player:
         print("We got", self.bankroll, "dollars boii!")
 
     def choose_bet(self):
-        #fancy code resulting in self.bet being changed based off running or total count id remember
+        # fancy code resulting in self.bet being changed based off running or total count id remember
         pass
 
     def manipulate_bankroll(self, bet):
@@ -436,18 +448,14 @@ class Player:
         else:
             self.bankroll += 2 * bet
 
-    def see_card(self, cards_seen):
-        self.cards_seen += cards_seen
-
 
 def main():
-
-    # keep in mind that all of these prints will be deleted eventually.
-
+    game = Game(1.5, True, True, True, 1, 0.5)
+    model = Model(200, 100, False)
     dealer = Dealer()
-    player = Player()
-
-    while True:
+    player = Player(model)
+    shoe = Shoe(dealer, game)
+    while game.round < model.rounds_to_be_played:
 
         bet = player.place_bet()
 
@@ -456,7 +464,6 @@ def main():
 
         dealer.displaycards(1)
         player.displaycards()
-        player.see_card(4)
 
         dealer_hand_val = check_value(dealer.hand)
         player_hand_val = check_value(player.hand)
@@ -478,7 +485,10 @@ def main():
                 over = True
             else:
                 print("Player has a", player_hand_val)
-                move = input("Hit or Stand?\n")
+                if model.is_manual:
+                    move = input("Hit or Stand?\n")
+                else:
+                    move = find_best_move(player_hand_val, dealer_hand_val)
                 if move == "stand":
                     player.stand()
                     player.displaycards()
@@ -487,7 +497,6 @@ def main():
                 elif move == "hit":
                     player.hit(dealer)
                     print("Player hits.")
-                    player.see_card(1)
                     player.displaycards()
                 elif move == "split":
                     player.see_card(2)
@@ -531,7 +540,6 @@ def main():
 
                 elif move == "hit":
                     dealer.hit(dealer)
-                    player.see_card(1)
                     print("Dealer hits to make", dealer_hand_val)
 
                 else:
@@ -551,23 +559,20 @@ def main():
             print("Push\n")
 
         # need to have the special payout for hitting a blackjack off the bat, maybe a flag in the manipulate function
-        player.count(dealer.hand, player.hand)
-        player.update_decks_remaining()
+        count(dealer.hand, player.hand, shoe, game)
         player.choose_bet()
 
         player.clear_hand()
         dealer.clear_hand()
 
-        print("Decks left:", player.decks_remaining)
         player.show_bankroll()
-        print(player.running_count, player.true_count)
+        print(shoe.running_count, shoe.true_count)
 
-        if len(dealer.deck.cards) / (number_of_decks * 52) < (1 - penetration):
+        if len(dealer.deck.cards) / (game.number_of_decks * 52) < (1 - game.penetration):
             print("New Deck!")
-            dealer.new_deck()
-            # resetting counts and such
-            player.running_count, player.true_count, player.cards_seen, player.decks_remaining \
-                = 0, 0, 0, number_of_decks
+            shoe = Shoe(dealer, game)
+        game.round += 1
+    print(player.bankroll)
 
 
 if __name__ == '__main__':
