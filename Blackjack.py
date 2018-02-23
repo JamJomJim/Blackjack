@@ -299,6 +299,11 @@ class Game:
         # for stat in stats print stat
         self.current_round = 0
         self.wrong_bs = 0
+        self.num_hits = 0
+        self.num_stand = 0
+        self.num_double = 0
+        self.num_split = 0
+        self.num_surrender = 0
 
 
 class Model:
@@ -430,21 +435,26 @@ class Player:
     def displaycards(self):
         print("Player has", self.hand)
 
-    def stand(self):
+    def stand(self, game):
+        game.num_stand += 1
         pass
 
-    def hit(self, dealer):
+    def hit(self, game, dealer):
         dealer.deal(self, 1)
+        game.num_hits += 1
 
-    def double(self, dealer):
+    def double(self, game, dealer):
         self.place_bet(self.bet)
         dealer.deal(self, 1)
+        game.num_double += 1
 
-    def split(self):
-        self.stand()
+    def split(self, game):
+        self.stand(game)
+        game.num_split += 1
 
-    def surrender(self):
-        self.stand()
+    def surrender(self, game):
+        game.num_surrender += 1
+        self.stand(game)
 
     def clear_hand(self):
         self.hand = []
@@ -473,7 +483,7 @@ def main():
     # Game(blackjack_payout, dealer_hit_soft17, surrender, insurance, number_of_decks, penetration)
     game = Game(1.5, True, True, True, 1, 0.5)
     # Model(starting_amount, rounds_to_be_played, is_manual):
-    model = Model(200, 10000, False)
+    model = Model(0, 10000, False)
     dealer = Dealer()
     player = Player(model)
     shoe = Shoe(dealer, game)
@@ -514,11 +524,11 @@ def main():
                     move = find_best_move(game, shoe, player, dealer)
 
                 if move == "stand":
-                    player.stand()
+                    player.stand(game)
                     player.displaycards()
                     over = True
                 elif move == "hit":
-                    player.hit(dealer)
+                    player.hit(game, dealer)
                     print("Player hits.")
                     player.displaycards()
                 elif move == "split":
@@ -526,10 +536,10 @@ def main():
                     print("No split yet")
                     over = True
                 elif move == "double":
-                    player.double(dealer)
+                    player.double(game, dealer)
                     over = True
                 elif move == "surrender":
-                    player.surrender()
+                    player.surrender(game)
                     print("No surrender yet")
                     over = True
 
@@ -597,9 +607,15 @@ def main():
             shoe = Shoe(dealer, game)
         game.current_round += 1
 
-    print(player.bankroll)
+    print("\nEnded with " + str(player.bankroll) + " dollars")
     print(str(model.rounds_to_be_played) + " hands in " + str(round(time.time() - start, 4)) + " seconds!")
-    print("Couldn't find basic strategy " + str(game.wrong_bs) + " times...")
+    print("Couldn't find basic strategy " + str(game.wrong_bs) + " times...\n")
+
+    print("Stand: " + str(game.num_stand))
+    print("Hit: " + str(game.num_hits))
+    print("Double: " + str(game.num_double))
+    print("Split: " + str(game.num_split))
+    print("Surrender: " + str(game.num_surrender))
 
 
 if __name__ == '__main__':
