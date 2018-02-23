@@ -7,269 +7,275 @@ import numpy
 # we could make count values an attribute of a card
 # how aggressive the bets are flag
 # have it autoplay - for now have it just hit or something, following BS can come later.
-# add in basic strategy
 
 
 # surrender > split > double > hit > stand
 
 suits, ranks = ["hearts", "diamonds", "spades", "clubs"], [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, "ace"]
-# player 5-17 in hard totals
+# player 17 -> 5 in hard totals
 hard_hand_strategy = \
 [
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
-[
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
-[
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
-[
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
-[
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
-[
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
-[
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']]]
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],       # -3
+  ['hit',    'hit',  'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'hit', 'hit'],
+  ['hit',    'double', 'double', 'double', 'double','hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],       # -2
+  ['hit',    'hit',  'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'hit', 'hit'],
+  ['hit',    'double', 'double', 'double', 'double','hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],       # -1
+  ['hit',    'hit',  'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'hit', 'hit'],
+  ['hit',    'double', 'double', 'double', 'double','hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],       # 0
+  ['hit',    'hit',  'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'hit', 'hit'],
+  ['hit',    'double', 'double', 'double', 'double','hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],       # 1
+  ['hit',    'hit',  'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'hit', 'hit'],
+  ['hit',    'double', 'double', 'double', 'double','hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],       # 2
+  ['hit',    'hit',  'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'hit', 'hit'],
+  ['hit',    'double', 'double', 'double', 'double','hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],       # 3
+  ['hit',    'hit',  'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double'],
+  ['double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'hit', 'hit'],
+  ['hit',    'double', 'double', 'double', 'double','hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
+  ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']]]
 
+
+# Large at top, small going downward
 # player 8 for soft totals
 soft_hand_strategy = \
 [
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']]]
-
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'double', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['double', 'double', 'double', 'double', 'double', 'stand', 'stand', 'hit', 'hit', 'hit'],
+  ['hit', 'double', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],                  # -3
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit']],
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'double', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['double', 'double', 'double', 'double', 'double', 'stand', 'stand', 'hit', 'hit', 'hit'],
+  ['hit', 'double', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],                  # -2
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit']],
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'double', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['double', 'double', 'double', 'double', 'double', 'stand', 'stand', 'hit', 'hit', 'hit'],
+  ['hit', 'double', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],                 # -1
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit']],
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'double', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['double', 'double', 'double', 'double', 'double', 'stand', 'stand', 'hit', 'hit', 'hit'],
+  ['hit', 'double', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],                 # 0
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit']],
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'double', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['double', 'double', 'double', 'double', 'double', 'stand', 'stand', 'hit', 'hit', 'hit'],
+  ['hit', 'double', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],                 # 1
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit']],
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'double', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['double', 'double', 'double', 'double', 'double', 'stand', 'stand', 'hit', 'hit', 'hit'],
+  ['hit', 'double', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],                 # 2
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit']],
+ [  # 2        3         4        5        6       7         8       9       10       A
+  ['stand', 'stand', 'stand', 'stand', 'stand',  'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['stand', 'stand', 'stand', 'stand', 'double', 'stand', 'stand', 'stand', 'stand', 'stand'],
+  ['double', 'double', 'double', 'double', 'double', 'stand', 'stand', 'hit', 'hit', 'hit'],
+  ['hit', 'double', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],                 # 3
+  ['hit', 'hit', 'double', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit'],
+  ['hit', 'hit', 'hit', 'double', 'double', 'hit', 'hit', 'hit', 'hit', 'hit']]]
 
 # player 10 for splitting
 splitting_hand_strategy = \
 [
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']],
- [
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None'],
-  ['None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None', 'None']]]
+ [  # 2        3        4       5       6       7      8        9       10       A
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'Y',    'Y',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'N',    'N',    'N',     'N'],     # -3
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N']],
 
+ [  # 2        3        4       5       6       7      8        9       10       A
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'Y',    'Y',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'N',    'N',    'N',     'N'],     # -2
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N']],
+
+ [  # 2        3        4       5       6       7      8        9       10       A
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'Y',    'Y',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'N',    'N',    'N',     'N'],     # -1
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N']],
+
+ [  # 2        3        4       5       6       7      8        9       10       A
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'Y',    'Y',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'N',    'N',    'N',     'N'],     # 0
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N']],
+
+ [  # 2        3        4       5       6       7      8        9       10       A
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'Y',    'Y',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'N',    'N',    'N',     'N'],     # 1
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N']],
+
+ [  # 2        3        4       5       6       7      8        9       10       A
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'Y',    'Y',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'N',    'N',    'N',     'N'],     # 2
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N']],
+
+ [  # 2        3        4       5       6       7      8        9       10       A
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'Y',    'Y',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'Y',    'Y',    'Y',     'Y'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'Y',    'N',    'N',    'N',     'N'],     # 3
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'N',    'N',    'N',    'N',    'N',    'N',     'N'],
+    ['N',     'N',     'N',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N'],
+    ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N']]]
 
 
 blackjack_payout = 1.5
 dealer_hit_soft17 = True
 surrender = True
 insurance = True
+double_after_split = True
 number_of_decks = 6
 penetration = 0.5
 
