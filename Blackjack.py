@@ -279,7 +279,7 @@ def find_best_move(shoe, player_value, dealer_value):
             return strat
     except IndexError:
         print("test")
-        return 'hit'
+        return 'stand'
 
 
 class Game:
@@ -473,7 +473,6 @@ def main():
 
         dealer.deal(player, 2)
         dealer.deal(dealer, 2)
-        player.hand = [Card("hearts", 2), Card("hearts", 4)]
         dealer.displaycards()
         player.displaycards()
 
