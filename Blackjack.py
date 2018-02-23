@@ -115,7 +115,6 @@ hard_hand_strategy = \
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']]]
 
-
 # Large at top, small going downward
 # player 8 for soft totals
 soft_hand_strategy = \
@@ -272,13 +271,19 @@ splitting_hand_strategy = \
             ['Y',     'Y',     'Y',    'Y',    'Y',    'N',    'N',    'N',    'N',     'N']]]
 
 
-def find_best_move(shoe, player_value, dealer_value):
+def find_best_move(game, shoe, player, dealer):
+    player_value = check_value(player.hand)
+    if dealer.hand[0].rank == "ace":
+        dealer_value = 11
+    else:
+        dealer_value = dealer.hand[0].rank
+    player_value = abs(17 - player_value)
     try:
-        strat = hard_hand_strategy[shoe.true_count + 3][player_value][dealer_value]
+        strat = hard_hand_strategy[shoe.true_count + 3][player_value][dealer_value - 2]
         if strat != 'None':
             return strat
     except IndexError:
-        print("test")
+        game.wrong_bs += 1
         return 'stand'
 
 
@@ -290,7 +295,10 @@ class Game:
         self.insurance = insurance
         self.number_of_decks = number_of_decks
         self.penetration = penetration
+        # stats class eventually?
+        # for stat in stats print stat
         self.current_round = 0
+        self.wrong_bs = 0
 
 
 class Model:
@@ -399,8 +407,7 @@ class Dealer:
         self.deck.cards = self.deck.cards[number_cards:]
 
     def hit(self, dealer):
-        dealer.deal(self, 1)
-        # i think this can all be "self"
+        self.deal(dealer, 1)
 
     def stand(self):
         pass
@@ -418,6 +425,7 @@ class Player:
         self.hand = []
         self.bankroll = model.starting_amount
         self.bet = 5
+        self.current_bet = 0
 
     def displaycards(self):
         print("Player has", self.hand)
@@ -428,21 +436,22 @@ class Player:
     def hit(self, dealer):
         dealer.deal(self, 1)
 
-    def double(self):
-        pass
+    def double(self, dealer):
+        self.place_bet(self.bet)
+        dealer.deal(self, 1)
 
     def split(self):
-        pass
+        self.stand()
 
     def surrender(self):
-        pass
+        self.stand()
 
     def clear_hand(self):
         self.hand = []
 
-    def place_bet(self):
-        self.bankroll -= self.bet
-        return self.bet
+    def place_bet(self, amount):
+        self.bankroll -= amount
+        self.current_bet += amount
 
     def show_bankroll(self):
         print("We got", self.bankroll, "dollars boii!")
@@ -455,7 +464,8 @@ class Player:
         if bet < 1:
             pass
         else:
-            self.bankroll += 2 * bet
+            self.bankroll += bet
+            self.current_bet = 0
 
 
 def main():
@@ -469,7 +479,7 @@ def main():
     shoe = Shoe(dealer, game)
     while game.current_round < model.rounds_to_be_played:
 
-        bet = player.place_bet()
+        player.place_bet(player.bet)
 
         dealer.deal(player, 2)
         dealer.deal(dealer, 2)
@@ -501,12 +511,11 @@ def main():
                 if model.is_manual:
                     move = input("Hit or Stand?\n")
                 else:
-                    move = find_best_move(shoe, player_hand_val, dealer_hand_val)
+                    move = find_best_move(game, shoe, player, dealer)
 
                 if move == "stand":
                     player.stand()
                     player.displaycards()
-                    print("Player stands with", player_hand_val)
                     over = True
                 elif move == "hit":
                     player.hit(dealer)
@@ -517,8 +526,7 @@ def main():
                     print("No split yet")
                     over = True
                 elif move == "double":
-                    player.double()
-                    print("No double yet")
+                    player.double(dealer)
                     over = True
                 elif move == "surrender":
                     player.surrender()
@@ -565,16 +573,15 @@ def main():
         # how does this handle busting when values are -1?
         if 21 >= dealer_hand_val > player_hand_val:
             print("Dealer wins!\n")
-            bet *= -1
-            player.manipulate_bankroll(bet)
+            player.current_bet = 0
         elif dealer_hand_val < player_hand_val <= 21:
             print("Player wins!\n")
-            player.manipulate_bankroll(bet)
+            player.manipulate_bankroll(player.current_bet * 2)
         elif dealer_hand_val < 0 and dealer_hand_val == player_hand_val:
             print("You're both losers.")
         else:
+            player.manipulate_bankroll(player.current_bet * 2)
             print("Push\n")
-
         # need to have the special payout for hitting a blackjack off the bat, maybe a flag in the manipulate function
         count(dealer.hand, player.hand, shoe, game)
         player.choose_bet()
@@ -592,6 +599,7 @@ def main():
 
     print(player.bankroll)
     print(str(model.rounds_to_be_played) + " hands in " + str(round(time.time() - start, 4)) + " seconds!")
+    print("Couldn't find basic strategy " + str(game.wrong_bs) + " times...")
 
 
 if __name__ == '__main__':
