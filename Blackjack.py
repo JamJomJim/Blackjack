@@ -7,7 +7,6 @@ import numpy
 # fix bets so that they're respond dynamically to counts
 # we could make count values an attribute of a card
 # how aggressive the bets are flag
-# have it autoplay - for now have it just hit or something, following BS can come later.
 
 
 # surrender > split > double > hit > stand
@@ -17,6 +16,9 @@ suits, ranks = ["hearts", "diamonds", "spades", "clubs"], [2, 3, 4, 5, 6, 7, 8, 
 hard_hand_strategy = \
     [
         [  # 2        3         4        5        6       7         8       9       10       A
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
@@ -33,6 +35,9 @@ hard_hand_strategy = \
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
         [  # 2        3         4        5        6       7         8       9       10       A
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
@@ -47,6 +52,9 @@ hard_hand_strategy = \
             ['hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
         [  # 2        3         4        5        6       7         8       9       10       A
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
@@ -63,6 +71,9 @@ hard_hand_strategy = \
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
         [  # 2        3         4        5        6       7         8       9       10       A
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
@@ -77,6 +88,9 @@ hard_hand_strategy = \
             ['hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
         [  # 2        3         4        5        6       7         8       9       10       A
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
@@ -93,6 +107,9 @@ hard_hand_strategy = \
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
         [  # 2        3         4        5        6       7         8       9       10       A
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
@@ -107,6 +124,9 @@ hard_hand_strategy = \
             ['hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
         [  # 2        3         4        5        6       7         8       9       10       A
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
+            ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
             ['stand', 'stand', 'stand', 'stand', 'stand',  'hit',   'hit',   'hit',   'hit',   'hit'],
@@ -287,21 +307,24 @@ def find_best_move(game, shoe, player, dealer, hand):
         player_value = 11
     else:
         player_value = player.hand[0][0].rank
+    try:
+        if len(player.hand[hand]) == 2 and player.hand[hand][0].rank == player.hand[hand][1].rank \
+                and splitting_hand_strategy[shoe.true_count + 3][abs(11 - player_value)][dealer_value - 2] == 'Y':
+            strat = 'split'
+        elif is_soft(player.hand[hand]):
+            player_value = check_value(player.hand[hand])
+            strat = soft_hand_strategy[shoe.true_count + 3][abs(20 - player_value)][dealer_value - 2]
+        else:
+            player_value = check_value(player.hand[hand])
+            strat = hard_hand_strategy[shoe.true_count + 3][abs(20 - player_value)][dealer_value - 2]
 
-    if player.hand[0][0].rank == player.hand[0][1].rank \
-            and splitting_hand_strategy[shoe.true_count + 3][abs(11 - player_value)][dealer_value - 2] == 'Y':
-        strat = 'split'
-    elif is_soft(player.hand[hand]):
-        player_value = check_value(player.hand[hand])
-        strat = soft_hand_strategy[shoe.true_count + 3][abs(20 - player_value)][dealer_value - 2]
-    else:
-        player_value = check_value(player.hand[hand])
-        strat = hard_hand_strategy[shoe.true_count + 3][abs(17 - player_value)][dealer_value - 2]
+        if strat != 'None':
+            return strat
 
-    if strat != 'None':
-        return strat
-    game.wrong_bs += 1
-    return 'stand'
+    except IndexError:
+        game.wrong_bs += 1
+        print("here")
+        return 'stand'
 
 
 class Game:
@@ -324,9 +347,10 @@ class Game:
 
 
 class Model:
-    def __init__(self, starting_amount, rounds_to_be_played, is_manual):
+    def __init__(self, starting_amount, rounds_to_be_played, min_bet, is_manual):
         self.starting_amount = starting_amount
         self.rounds_to_be_played = rounds_to_be_played
+        self.min_bet = min_bet
         self.is_manual = is_manual
 
 
@@ -441,7 +465,7 @@ class Dealer:
         if start is None:
             print(self.hand)
         else:
-            print("Dealer has [" + str(self.hand[0]) + ", unknown]")
+            print("Dealer has [" + str(self.hand[0][0]) + ", unknown]")
 
     def deal(self, person, hand, number_cards):
         person.hand[hand] += self.deck.cards[0:number_cards]
@@ -465,15 +489,12 @@ class Player:
     def __init__(self, model):
         self.hand = [[]]
         self.bankroll = model.starting_amount
-        self.bet = 5
-        self.current_bet = [0, 0, 0, 0]
+        self.bet = model.min_bet
+        self.current_bet = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.total_bet = 0
 
-    def displaycards(self):
-        print("Player has", self.hand)
-
-    def stand(self, game):
-        game.num_stand += 1
-        pass
+    def displaycards(self, i):
+        print("Player has", self.hand[i])
 
     def hit(self, game, dealer, hand):
         dealer.deal(self, hand, 1)
@@ -503,6 +524,7 @@ class Player:
     def place_bet(self, amount, hand):
         self.bankroll -= amount
         self.current_bet[hand] += amount
+        self.total_bet += amount
         # self.current_bet[hand] += amount
 
     def show_bankroll(self):
@@ -514,16 +536,16 @@ class Player:
 
     def manipulate_bankroll(self, bet, hand):
         self.bankroll += bet
+        print(self.current_bet[hand])
         self.current_bet[hand] = 0
-        print("5")
 
 
 def main():
     start = time.time()
     # Game(blackjack_payout, dealer_hit_soft17, surrender, insurance, number_of_decks, penetration)
-    game = Game(1.5, True, True, True, 1, 0.5)
+    game = Game(1.5, True, True, True, 6, 0.75)
     # Model(starting_amount, rounds_to_be_played, is_manual):
-    model = Model(0, 1000, False)
+    model = Model(0, 100000, 10, False)
     dealer = Dealer()
     player = Player(model)
     shoe = Shoe(dealer, game)
@@ -532,9 +554,10 @@ def main():
         player.place_bet(player.bet, 0)
 
         dealer.deal(player, 0, 2)
+        # player.hand[0] = [Card("hearts", 2), Card("hearts", 2)]
         dealer.deal(dealer, 0, 2)
-        dealer.displaycards()
-        player.displaycards()
+        dealer.displaycards(1)
+        player.displaycards(0)
 
     # test for card values
     # print(check_value([Card("hearts", "ace"), Card("hearts", 9), Card("hearts", "ace"), Card("hearts", "ace")]))
@@ -543,24 +566,24 @@ def main():
         dealer_hand_val = check_value(dealer.hand[0])
         over = False
         if dealer_hand_val == 21:
-            print("Dealer Blackjack!")
+            # print("Dealer Blackjack!")
             over = True
 
         while not over:
             dealer_hand_val = check_value(dealer.hand[0])
-            print("Dealer hand: ", dealer.hand[0])
+            # print("Dealer hand: ", dealer.hand[0])
 
             if dealer_hand_val == 21:
-                print("Dealer Lesser Blackjack!")
+                # print("Dealer Lesser Blackjack!")
                 over = True
             elif dealer_hand_val > 21 or dealer_hand_val == -1:
-                print("Dealer busts with", dealer_hand_val)
+                # print("Dealer busts with", dealer_hand_val)
                 over = True
             else:
                 # if the dealer hits on a soft17 or whatever, this is searching for a card instead of a rank
-                # if dealer_hand_val == 17 and dealer.hand.("ace") and dealer_hit_soft17:
-                # move = "hit"
-                if 1 < dealer_hand_val < 16:
+                if game.dealer_hit_soft17 and dealer_hand_val == 17 and is_soft(dealer.hand[0]):
+                    move = "hit"
+                elif 1 < dealer_hand_val <= 16:
                     move = "hit"
                 else:
                     move = "stand"
@@ -568,28 +591,26 @@ def main():
                 if move == "stand":
                     dealer.stand()
                     over = True
-                    print("Dealer stands with", dealer_hand_val)
+                    # print("Dealer stands with", dealer_hand_val)
 
                 elif move == "hit":
                     dealer.hit(dealer, 0)
-                    print("Dealer hits to make", dealer_hand_val)
+                    # print("Dealer hits to make", dealer_hand_val)
 
                 else:
-                    print("Empty deck! Dealer has", dealer_hand_val)
+                    # print("Empty deck! Dealer has", dealer_hand_val)
                     over = True
-        over = False
 
+        dealer_hand_val = check_value(dealer.hand[0])
         # player moves
-
         for i, hand in enumerate(player.hand):
-            if i ==1:
-                print("test")
             player_hand_val = check_value(player.hand[i])
             over = False
             while not over:
                 if player_hand_val == 21:
                     print("Player Blackjack!")
-                    over = True
+                    player.manipulate_bankroll(player.current_bet[i] * 2.5, i)
+                    break
                 time.sleep(0)  # helpful for debugging time.sleep(seconds)
                 player_hand_val = check_value(player.hand[i])
                 if player_hand_val == 21:
@@ -601,31 +622,37 @@ def main():
                 else:
                     print("Player has a", player_hand_val)
                     if model.is_manual:
-                        move = input("Hit or Stand?\n")
+                        move = input("What do you want to do?\n")
                     else:
                         move = find_best_move(game, shoe, player, dealer, i)
 
                     if move == "stand":
-                        player.stand(game)
-                        player.displaycards()
+                        print("Player Stands.")
+                        game.num_stand += 1
                         over = True
                     elif move == "hit":
                         player.hit(game, dealer, i)
                         print("Player hits.")
-                        player.displaycards()
+                        player.displaycards(i)
                     elif move == "split":
                         print("Player splits.")
                         player.split(game, dealer, i)
                         print(player.current_bet)
+                        player.displaycards(i)
                     elif move == "double":
+                        print("Player doubles.")
                         player.double(game, dealer, i)
+                        player.displaycards(i)
                         over = True
                     elif move == "surrender":
                         player.surrender(game)
                         print("No surrender yet")
                         over = True
+                    else:
+                        print("you can't do that")
 
-            # how does this handle busting when values are -1?
+            player_hand_val = check_value(player.hand[i])
+            print("Dealer has a " + str(dealer_hand_val))
             if 21 >= dealer_hand_val > player_hand_val:
                 print("Dealer wins!\n")
                 player.current_bet[i] = 0
@@ -634,10 +661,10 @@ def main():
                 player.manipulate_bankroll(player.current_bet[i] * 2, i)
             elif dealer_hand_val < 0 and dealer_hand_val == player_hand_val:
                 print("You're both losers.")
+                player.current_bet[i] = 0
             else:
-                player.manipulate_bankroll(player.current_bet[i] * 2, i)
+                player.manipulate_bankroll(player.current_bet[i], i)
                 print("Push\n")
-        # need to have the special payout for hitting a blackjack off the bat, maybe a flag in the manipulate function
         count(dealer.hand[0], player.hand, shoe, game)
         player.choose_bet()
 
@@ -661,6 +688,8 @@ def main():
     print("Double: " + str(game.num_double))
     print("Split: " + str(game.num_split))
     print("Surrender: " + str(game.num_surrender))
+
+    print(player.bankroll/player.total_bet)
 
 
 if __name__ == '__main__':
