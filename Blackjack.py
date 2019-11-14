@@ -375,8 +375,16 @@ class Hand:
         dealer.deal(hand=self, number_cards=1)
 
     def split(self, game, dealer):
-        pass
-        # TODO
+
+        new_hand = Hand(self.owner)
+
+        new_hand.cards = [self.cards[1]]
+        dealer.deal(hand=new_hand, number_cards=1)
+
+        self.cards = self.cards[0:1]
+        dealer.deal(hand=self, number_cards=1)
+
+        self.owner.hands.append(new_hand)
 
     def surrender(self, game):
         game.num_surrender += 1
@@ -513,6 +521,8 @@ def main():
         dealer.deal(hand=dealer.hand, number_cards=2)
         dealer.display_cards()
 
+        print("\n")
+
         # Checks for dealer blackjack
         if check_value(dealer.hand.cards) == 21:
             print("Dealer Blackjack!")
@@ -525,89 +535,88 @@ def main():
             if player_hand_val == 21:
                 print("Player Blackjack!")
                 player.bankroll += hand.current_bet * 2.5
-                continue
-            while not hand_done:
-                player_hand_val = check_value(hand.cards)
-                if player_hand_val == 21:
-                    print("Player Lesser Blackjack!")
-                    hand_done = True
-                elif player_hand_val == -1 or player_hand_val > 21:
-                    print("Player Bust")
-                    hand_done = True
-                else:
-                    print("Player has a", player_hand_val)
-                    if model.is_manual:
-                        move = input("What do you want to do?\n")
+
+            else:
+                while not hand_done:
+                    player_hand_val = check_value(hand.cards)
+                    if player_hand_val == 21:
+                        print("Player Lesser Blackjack!")
+                        hand_done = True
+                    elif player_hand_val == -1 or player_hand_val > 21:
+                        print("Player Bust")
+                        hand_done = True
                     else:
-                        move = find_best_move(game=game, shoe=shoe, player_hand=hand.cards, dealer_hand=dealer.hand)
+                        print("Player has ", hand, "worth", player_hand_val)
+                        if model.is_manual:
+                            move = input("What do you want to do?\n")
+                        else:
+                            move = find_best_move(game=game, shoe=shoe, player_hand=hand.cards, dealer_hand=dealer.hand.cards)
+
+                        if move == "stand":
+                            print("Player Stands.")
+                            game.num_stand += 1
+                            hand_done = True
+                        elif move == "hit":
+                            hand.hit(dealer)
+                            print("Player hits.")
+                        elif move == "split":
+                            print("Player splits.")
+                            hand.split(game, dealer)
+                            player.display_cards()
+                        elif move == "double":
+                            print("Player doubles.")
+                            hand.double(dealer=dealer)
+                            print("Player has ", hand, "worth", check_value(hand.cards))
+                            hand_done = True
+                        elif move == "surrender":
+                            hand.surrender(game)
+                            print("No surrender yet")
+                            hand_done = True
+                        else:
+                            print("you can't do that")
+
+            # Dealer's turn
+            dealer_done = False
+            while not dealer_done:
+                dealer_hand_val = check_value(dealer.hand.cards)
+                print("Dealer hand: ", dealer.hand)
+
+                if dealer_hand_val == 21:
+                    print("Dealer Lesser Blackjack!")
+                    dealer_done = True
+                elif dealer_hand_val == -1:
+                    print("Dealer busts with", dealer_hand_val)
+                    dealer_done = True
+                else:
+                    # if the dealer hits on a soft17 or whatever, this is searching for a card instead of a rank
+                    if game.dealer_hit_soft17 and dealer_hand_val == 17 and is_soft(dealer.hand.cards):
+                        move = "hit"
+                    elif dealer_hand_val <= 16:
+                        move = "hit"
+                    else:
+                        move = "stand"
 
                     if move == "stand":
-                        print("Player Stands.")
-                        game.num_stand += 1
-                        hand_done = True
-                    elif move == "hit":
-                        hand.hit(dealer)
-                        print("Player hits.")
-                        player.display_cards()
-                    elif move == "split":
-                        print("Player splits.")
-                        hand.split(game, dealer)
-                        print(hand.current_bet)
-                        player.display_cards()
-                    elif move == "double":
-                        print("Player doubles.")
-                        hand.double(dealer=dealer)
-                        player.display_cards()
-                        hand_done = True
-                    elif move == "surrender":
-                        hand.surrender(game)
-                        print("No surrender yet")
-                        hand_done = True
+                        dealer.hand.stand()
+                        dealer_done = True
+                        print("Dealer stands with", check_value(dealer.hand.cards))
                     else:
-                        print("you can't do that")
+                        dealer.hand.hit(dealer)
+                        print("Dealer hits to make", check_value(dealer.hand.cards))
 
-        # Dealer's turn
-        dealer_done = False
-        while not dealer_done:
-            dealer_hand_val = check_value(dealer.hand.cards)
-            print("Dealer hand: ", dealer.hand)
+            for hand in player.hands:
+                player_hand_val = check_value(hand.cards)
+                dealer_hand_val = check_value(dealer.hand.cards)
 
-            if dealer_hand_val == 21:
-                print("Dealer Lesser Blackjack!")
-                dealer_done = True
-            elif dealer_hand_val == -1:
-                print("Dealer busts with", dealer_hand_val)
-                dealer_done = True
-            else:
-                # if the dealer hits on a soft17 or whatever, this is searching for a card instead of a rank
-                if game.dealer_hit_soft17 and dealer_hand_val == 17 and is_soft(dealer.hand.cards):
-                    move = "hit"
-                elif dealer_hand_val <= 16:
-                    move = "hit"
+                print("Player has " + str(player_hand_val))
+                print("Dealer has " + str(dealer_hand_val))
+
+                if 21 >= dealer_hand_val > player_hand_val:
+                    print("Dealer wins!\n")
+                elif dealer_hand_val < player_hand_val <= 21:
+                    print("Player wins!\n")
                 else:
-                    move = "stand"
-
-                if move == "stand":
-                    dealer.hand.stand()
-                    dealer_done = True
-                    print("Dealer stands with", dealer_hand_val)
-                else:
-                    dealer.hand.hit(dealer)
-                    print("Dealer hits to make", dealer_hand_val)
-
-        for hand in player.hands:
-            player_hand_val = check_value(hand.cards)
-            dealer_hand_val = check_value(dealer.hand.cards)
-
-            print("Player has " + str(player_hand_val))
-            print("Dealer has " + str(dealer_hand_val))
-
-            if 21 >= dealer_hand_val > player_hand_val:
-                print("Dealer wins!\n")
-            elif dealer_hand_val < player_hand_val <= 21:
-                print("Player wins!\n")
-            else:
-                print("Push\n")
+                    print("Push\n")
 
         player.clear_hand()
         dealer.clear_hand()
@@ -626,23 +635,4 @@ def main():
 
 
 if __name__ == '__main__':
-
-    game = Game(blackjack_payout=1.5,
-                dealer_hit_soft17=True,
-                surrender=True,
-                insurance=True,
-                number_of_decks=6,
-                penetration=0.75)
-
-    model = Model(starting_amount=0, rounds_to_be_played=100, min_bet=10, is_manual=False)
-    dealer = Dealer()
-    player = Player(model)
-    shoe = Shoe(dealer, game)
-
-    player_cards = [Card("hearts", 2), Card("hearts", 7)]
-    dealer_cards = [Card("hearts", 5), Card("hearts", "ace")]
-    print(check_value(player_cards))
-    print(find_best_move(game=game, shoe=shoe, player_hand=player_cards, dealer_hand=dealer_cards))
-
-
-    # main()
+    main()
