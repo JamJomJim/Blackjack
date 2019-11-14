@@ -306,7 +306,7 @@ def main():
                 number_of_decks=6,
                 penetration=0.75)
 
-    model = Model(starting_amount=0, rounds_to_be_played=100, min_bet=10, is_manual=False)
+    model = Model(starting_amount=0, rounds_to_be_played=100, min_bet=10, is_manual=True)
     dealer = Dealer()
     player = Player(model)
     shoe = Shoe(dealer, game)
@@ -314,24 +314,24 @@ def main():
 
         player.place_bet(player.bet, 0)
 
-        dealer.deal(player, 0, 2)
+        dealer.deal(person=player, number_cards=2)
         # player.hand[0] = [Card("hearts", 2), Card("hearts", 2)]
-        dealer.deal(dealer, 0, 2)
-        dealer.displaycards(1)
-        player.displaycards(0)
+        dealer.deal(person=dealer, number_cards=2)
+        dealer.display_cards()
+        player.display_cards()
 
     # test for card values
     # print(check_value([Card("hearts", "ace"), Card("hearts", 9), Card("hearts", "ace"), Card("hearts", "ace")]))
 
         # dealer moves
-        dealer_hand_val = check_value(dealer.hand[0])
+        dealer_hand_val = check_value(dealer.hand)
         over = False
         if dealer_hand_val == 21:
             # print("Dealer Blackjack!")
             over = True
 
         while not over:
-            dealer_hand_val = check_value(dealer.hand[0])
+            dealer_hand_val = check_value(dealer.hand)
             # print("Dealer hand: ", dealer.hand[0])
 
             if dealer_hand_val == 21:
@@ -355,17 +355,17 @@ def main():
                     # print("Dealer stands with", dealer_hand_val)
 
                 elif move == "hit":
-                    dealer.hit(dealer, 0)
+                    dealer.hit(dealer)
                     # print("Dealer hits to make", dealer_hand_val)
 
                 else:
                     # print("Empty deck! Dealer has", dealer_hand_val)
                     over = True
 
-        dealer_hand_val = check_value(dealer.hand[0])
+        dealer_hand_val = check_value(dealer.hand)
         # player moves
         for i, hand in enumerate(player.hand):
-            player_hand_val = check_value(player.hand[i])
+            player_hand_val = check_value(player.hand)
             over = False
             while not over:
                 if player_hand_val == 21:
@@ -373,7 +373,7 @@ def main():
                     player.manipulate_bankroll(player.current_bet[i] * 2.5, i)
                     break
                 time.sleep(0)  # helpful for debugging time.sleep(seconds)
-                player_hand_val = check_value(player.hand[i])
+                player_hand_val = check_value(player.hand)
                 if player_hand_val == 21:
                     print("Player Lesser Blackjack!")
                     over = True
@@ -385,25 +385,25 @@ def main():
                     if model.is_manual:
                         move = input("What do you want to do?\n")
                     else:
-                        move = find_best_move(game, shoe, player, dealer, i)
+                        move = find_best_move(game, shoe, player, dealer)
 
                     if move == "stand":
                         print("Player Stands.")
                         game.num_stand += 1
                         over = True
                     elif move == "hit":
-                        player.hit(game, dealer, i)
+                        player.hit(game, dealer)
                         print("Player hits.")
-                        player.displaycards(i)
+                        player.display_cards()
                     elif move == "split":
                         print("Player splits.")
-                        player.split(game, dealer, i)
+                        player.split(game, dealer)
                         print(player.current_bet)
-                        player.displaycards(i)
+                        player.display_cards()
                     elif move == "double":
                         print("Player doubles.")
-                        player.double(game, dealer, i)
-                        player.displaycards(i)
+                        player.double(game, dealer)
+                        player.display_cards()
                         over = True
                     elif move == "surrender":
                         player.surrender(game)
@@ -412,7 +412,7 @@ def main():
                     else:
                         print("you can't do that")
 
-            player_hand_val = check_value(player.hand[i])
+            player_hand_val = check_value(player.hand)
             print("Dealer has a " + str(dealer_hand_val))
             if 21 >= dealer_hand_val > player_hand_val:
                 print("Dealer wins!\n")
@@ -523,24 +523,21 @@ class Dealer:
         self.deck = None
         self.hand = []
 
-    def displaycards(self, start=None):
-        if start is None:
-            print(self.hand)
-        else:
-            print("Dealer has [" + str(self.hand[0][0]) + ", unknown]")
+    def display_cards(self):
+        print("Dealer has", self.hand)
 
     def deal(self, person, number_cards):
-        person.hand[hand] += self.deck.cards[0:number_cards]
+        person.hand += self.deck.cards[0:number_cards]
         self.deck.cards = self.deck.cards[number_cards:]
 
-    def hit(self, dealer, hand):
+    def hit(self, dealer):
         self.deal(person=dealer, number_cards=1)
 
     def stand(self):
         pass
 
     def clear_hand(self):
-        self.hand[0] = []
+        self.hand = []
 
     def new_decks(self, game):
         self.deck = Deck(game)
@@ -555,11 +552,11 @@ class Player:
         self.current_bet = [0, 0, 0, 0, 0, 0, 0, 0]
         self.total_bet = 0
 
-    def displaycards(self, i):
-        print("Player has", self.hand[i])
+    def display_cards(self):
+        print("Player has", self.hand)
 
-    def hit(self, game, dealer, hand):
-        dealer.deal(self, hand, 1)
+    def hit(self, game, dealer):
+        dealer.deal(self, 1)
         game.num_hits += 1
 
     def double(self, game, dealer, hand):
@@ -567,8 +564,8 @@ class Player:
         dealer.deal(self, hand, 1)
         game.num_double += 1
 
-    def split(self, game, dealer, i):
-        temp_hand = [self.hand[i][0]]
+    def split(self, game, dealer):
+        temp_hand = [self.hand[0]]
         del self.hand[i][-1]
         self.hand.append(temp_hand)
         dealer.deal(self, -1, 1)
@@ -602,15 +599,15 @@ class Player:
         self.current_bet[hand] = 0
 
 
-def find_best_move(game, shoe, player, dealer, hand):
-    if dealer.hand[0][0].rank == "ace":
+def find_best_move(game, shoe, player, dealer):
+    if dealer.hand[0].rank == "ace":
         dealer_value = 11
     else:
-        dealer_value = dealer.hand[0][0].rank
+        dealer_value = dealer.hand[0].rank
     if player.hand[hand][0].rank == "ace":
         player_value = 11
     else:
-        player_value = player.hand[0][0].rank
+        player_value = player.hand[0].rank
     try:
         if len(player.hand[hand]) == 2 and player.hand[hand][0].rank == player.hand[hand][1].rank \
                 and splitting_hand_strategy[shoe.true_count + 3][abs(11 - player_value)][dealer_value - 2] == 'Y':
