@@ -2,6 +2,7 @@ import random
 import time
 import math
 
+# doing this to test
 # getters and setters would make things look nicer, just a refactoring thing, also its more proper
 # fix bets so that they're respond dynamically to counts
 # we could make count values an attribute of a card
