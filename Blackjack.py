@@ -1,6 +1,5 @@
 import random
 import time
-import math
 
 # fix bets so that they're respond dynamically to counts
 # we could make count values an attribute of a card
@@ -29,7 +28,7 @@ hard_hand_strategy = \
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
-            ['hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit'],
+            ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
         [  # 2        3         4        5        6       7         8       9       10       A
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
@@ -47,7 +46,7 @@ hard_hand_strategy = \
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
-            ['hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit'],
+            ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
         [  # 2        3         4        5        6       7         8       9       10       A
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
@@ -65,7 +64,7 @@ hard_hand_strategy = \
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
-            ['hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit'],
+            ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
         [  # 2        3         4        5        6       7         8       9       10       A
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
@@ -83,7 +82,7 @@ hard_hand_strategy = \
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
-            ['hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit'],
+            ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
         [  # 2        3         4        5        6       7         8       9       10       A
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
@@ -101,7 +100,7 @@ hard_hand_strategy = \
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
-            ['hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit'],
+            ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
         [  # 2        3         4        5        6       7         8       9       10       A
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
@@ -119,7 +118,7 @@ hard_hand_strategy = \
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
-            ['hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit'],
+            ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']],
         [  # 2        3         4        5        6       7         8       9       10       A
             ['stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand', 'stand'],
@@ -137,7 +136,7 @@ hard_hand_strategy = \
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
-            ['hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit', 'hit'],
+            ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit'],
             ['hit',    'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit',   'hit']]]
 
 # Large at top, small going downward
@@ -324,9 +323,9 @@ class Model:
 
 
 class Deck:
-    def __init__(self, game):
+    def __init__(self, number_of_decks):
         self.cards = []
-        for _ in range(game.number_of_decks):
+        for _ in range(number_of_decks):
             for suit in suits:
                 for rank in ranks:
                     self.cards.append(Card(suit, rank))
@@ -339,11 +338,11 @@ class Deck:
 
 
 class Shoe:
-    def __init__(self, dealer, game):
+    def __init__(self, dealer):
         self.cards_seen = 0
         self.running_count = 0
         self.true_count = 0
-        dealer.new_decks(game)
+        dealer.new_shoe()
 
 
 class Card:
@@ -401,22 +400,26 @@ class Hand:
 
 
 class Dealer:
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.deck = None
         self.hand = Hand(self)
+        self.shoe = Shoe(self)
 
     def display_cards(self):
         print("Dealer has", self.hand)
 
     def deal(self, hand, number_cards):
         hand.cards += self.deck.cards[0:number_cards]
+        self.shoe.running_count += get_count(self.deck.cards[0:number_cards])
+        self.shoe.true_count = self.shoe.running_count / self.game.number_of_decks
         self.deck.cards = self.deck.cards[number_cards:]
 
     def clear_hand(self):
         self.hand = Hand(self)
 
-    def new_decks(self, game):
-        self.deck = Deck(game)
+    def new_shoe(self):
+        self.deck = Deck(self.game.number_of_decks)
         self.deck.shuffle()
 
 
@@ -437,22 +440,22 @@ class Player:
         hand.current_bet += amount
 
 
-def find_best_move(game, shoe, player_hand, dealer_hand):
-    best_move = "hit"
+def find_best_move(shoe, player_hand, dealer_hand):
     d_index = check_value(dealer_hand[0:1]) - 2
+    current_count = round(shoe.true_count)
     # can the hand be split
     if len(player_hand) == 2 and player_hand[0].rank == player_hand[1].rank:
         p_index = abs(check_value(player_hand[0:1]) - 11)
-        if splitting_hand_strategy[shoe.true_count][p_index][d_index] == "Y":
+        if splitting_hand_strategy[current_count][p_index][d_index] == "Y":
             return "split"
 
     p_index = abs(check_value(player_hand) - 20)
     # If the hand is soft
     if is_soft(player_hand):
-        return soft_hand_strategy[shoe.true_count][p_index][d_index]
+        return soft_hand_strategy[current_count][p_index][d_index]
     # If the hand is hard
     else:
-        return hard_hand_strategy[shoe.true_count][p_index][d_index]
+        return hard_hand_strategy[current_count][p_index][d_index]
 
 
 def check_value(hand):
@@ -497,6 +500,16 @@ def is_soft(hand):
         return False
 
 
+def get_count(cards):
+    count = 0
+    for card in cards:
+        if card.rank in [2, 3, 4, 5, 6]:
+            count += 1
+        elif card.rank in [10, "ace"]:
+            count -= 1
+    return count
+
+
 def main():
     start = time.time()
     game = Game(blackjack_payout=1.5,
@@ -507,9 +520,8 @@ def main():
                 penetration=0.75)
 
     model = Model(starting_amount=0, rounds_to_be_played=100, min_bet=10, is_manual=False)
-    dealer = Dealer()
+    dealer = Dealer(game=game)
     player = Player(model)
-    shoe = Shoe(dealer, game)
 
     while game.current_round < model.rounds_to_be_played:
 
@@ -550,7 +562,7 @@ def main():
                         if model.is_manual:
                             move = input("What do you want to do?\n")
                         else:
-                            move = find_best_move(game=game, shoe=shoe, player_hand=hand.cards, dealer_hand=dealer.hand.cards)
+                            move = find_best_move(shoe=dealer.shoe, player_hand=hand.cards, dealer_hand=dealer.hand.cards)
 
                         if move == "stand":
                             print("Player Stands.")
@@ -621,12 +633,12 @@ def main():
         player.clear_hand()
         dealer.clear_hand()
 
-        print("Running count: " + str(shoe.running_count), "True count:" + str(shoe.true_count))
+        print("Running count: " + str(dealer.shoe.running_count), "True count:" + str(dealer.shoe.true_count))
         print("Cards remaining in deck: " + str(len(dealer.deck.cards)) + "\n")
 
         if len(dealer.deck.cards) / (game.number_of_decks * 52) < (1 - game.penetration):
             print("New Deck!")
-            shoe = Shoe(dealer, game)
+            dealer.new_shoe()
 
         game.current_round += 1
 
