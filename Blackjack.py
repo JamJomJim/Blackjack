@@ -362,6 +362,8 @@ class Hand:
     def __init__(self, person):
         self.owner = person
         self.cards = []
+        self.has_split = False
+        self.has_split_aces = False
         self.current_bet = 0
 
     def hit(self, dealer):
@@ -374,13 +376,18 @@ class Hand:
     def split(self, dealer):
 
         new_hand = Hand(self.owner)
-
+        new_hand.has_split = True
         new_hand.cards = [self.cards[1]]
         dealer.deal(hand=new_hand, number_cards=1)
         new_hand.owner.place_bet(self.owner.bet, new_hand)
 
         self.cards = self.cards[0:1]
+        self.has_split = True
         dealer.deal(hand=self, number_cards=1)
+
+        if new_hand.cards[0].rank == "ace":
+            new_hand.has_split_aces = True
+            self.has_split_aces = True
 
         self.owner.hands.append(new_hand)
 
@@ -441,6 +448,7 @@ class Player:
 
 
 def find_best_move(shoe, player_hand, dealer_hand):
+    player_cards = player_hand.cards
     d_index = check_value(dealer_hand[0:1]) - 2
     current_count = round(shoe.true_count)
 
@@ -451,18 +459,23 @@ def find_best_move(shoe, player_hand, dealer_hand):
         current_count = -3
 
     # can the hand be split
-    if len(player_hand) == 2 and player_hand[0].rank == player_hand[1].rank:
-        p_index = abs(check_value(player_hand[0:1]) - 11)
+    if len(player_cards) == 2 and player_cards[0].rank == player_cards[1].rank:
+        p_index = abs(check_value(player_cards[0:1]) - 11)
         if splitting_hand_strategy[current_count][p_index][d_index] == "Y":
             return "split"
 
-    p_index = abs(check_value(player_hand) - 20)
+    p_index = abs(check_value(player_cards) - 20)
     # If the hand is soft
-    if is_soft(player_hand):
-        return soft_hand_strategy[current_count][p_index][d_index]
+    if is_soft(player_cards):
+        best_move = soft_hand_strategy[current_count][p_index][d_index]
     # If the hand is hard
     else:
-        return hard_hand_strategy[current_count][p_index][d_index]
+        best_move = hard_hand_strategy[current_count][p_index][d_index]
+
+    if best_move == "double" and (len(player_cards) > 2 or player_hand.has_split):
+        best_move = "hit"
+
+    return best_move
 
 
 def check_value(hand):
@@ -526,7 +539,7 @@ def main():
                 number_of_decks=6,
                 penetration=0.75)
 
-    model = Model(starting_amount=0, rounds_to_be_played=1000, min_bet=10, is_manual=False)
+    model = Model(starting_amount=0, rounds_to_be_played=10000, min_bet=10, is_manual=False)
     dealer = Dealer(game=game)
     player = Player(model)
 
@@ -535,6 +548,7 @@ def main():
         player.place_bet(amount=player.bet, hand=player.hands[0])
 
         dealer.deal(hand=player.hands[0], number_cards=2)
+        # player.hands[0].cards = [Card("spades", "ace"), Card("spades", "ace")]
         player.display_cards()
 
         dealer.deal(hand=dealer.hand, number_cards=2)
@@ -551,7 +565,7 @@ def main():
         # Player's turn
         for hand in player.hands:
             hand_done = False
-            while not hand_done:
+            while not hand_done and not hand.has_split_aces:
                 player_hand_val = check_value(hand.cards)
                 print("Player has ", hand, "worth", player_hand_val)
                 if player_hand_val == 21:
@@ -564,7 +578,7 @@ def main():
                     if model.is_manual:
                         move = input("What do you want to do?\n")
                     else:
-                        move = find_best_move(shoe=dealer.shoe, player_hand=hand.cards, dealer_hand=dealer.hand.cards)
+                        move = find_best_move(shoe=dealer.shoe, player_hand=hand, dealer_hand=dealer.hand.cards)
 
                     if move == "stand":
                         print("Player Stands.")
@@ -630,7 +644,7 @@ def main():
                 print("Player Blackjack!!\n")
                 print("Player wins $" + str(hand.current_bet * 2.5), "\n")
 
-            elif 21 >= dealer_hand_val > player_hand_val:
+            elif 21 >= dealer_hand_val > player_hand_val or player_hand_val == -1:
                 print("Dealer wins!\n")
             elif dealer_hand_val < player_hand_val <= 21:
                 player.bankroll += hand.current_bet * 2
@@ -655,7 +669,14 @@ def main():
 
     print("\nEnded with $" + str(player.bankroll) + " dollars")
     print(str(model.rounds_to_be_played) + " hands in " + str(round(time.time() - start, 4)) + " seconds!")
+    return player.bankroll
 
 
 if __name__ == '__main__':
+    # total = 0
+    # for i in range(100):
+    #     total += main()
+    # print(total / 100)
+
     main()
+
