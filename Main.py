@@ -6,6 +6,7 @@ from basic_strategy.splitting_hand_strategy import splitting_hand_strategy
 
 suits, ranks = ["hearts", "diamonds", "spades", "clubs"], [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, "ace"]
 
+
 class Game:
     def __init__(self, blackjack_payout, dealer_hit_soft17, surrender, insurance, number_of_decks, penetration):
         self.blackjack_payout = blackjack_payout
@@ -71,12 +72,12 @@ class Card:
 
 
 class Hand:
-    def __init__(self, person):
-        self.owner = person
-        self.cards = []
-        self.has_split = False
-        self.has_split_aces = False
-        self.current_bet = 0
+    def __init__(self, owner, cards, has_split, has_split_aces, current_bet):
+        self.owner = owner
+        self.cards = cards
+        self.has_split = has_split
+        self.has_split_aces = has_split_aces
+        self.current_bet = current_bet
 
     def hit(self, dealer):
         dealer.deal(hand=self, number_cards=1)
@@ -87,7 +88,7 @@ class Hand:
 
     def split(self, dealer):
 
-        new_hand = Hand(self.owner)
+        new_hand = Hand(self.owner, [], False, False, 0)
         new_hand.has_split = True
         new_hand.cards = [self.cards[1]]
         dealer.deal(hand=new_hand, number_cards=1)
@@ -121,7 +122,7 @@ class Dealer:
     def __init__(self, game):
         self.game = game
         self.deck = None
-        self.hand = Hand(self)
+        self.hand = Hand(self, [], False, False, 0)
         self.shoe = Shoe(self)
 
     def display_cards(self):
@@ -134,7 +135,7 @@ class Dealer:
         self.deck.cards = self.deck.cards[number_cards:]
 
     def clear_hand(self):
-        self.hand = Hand(self)
+        self.hand = Hand(self, [], False, False, 0)
 
     def new_shoe(self):
         self.deck = Deck(self.game.number_of_decks)
@@ -143,7 +144,7 @@ class Dealer:
 
 class Player:
     def __init__(self, model):
-        self.hands = [Hand(self)]
+        self.hands = [Hand(self, [], False, False, 0)]
         self.bankroll = model.starting_amount
         self.bet = model.min_bet
 
@@ -151,7 +152,7 @@ class Player:
         print("Player has", self.hands)
 
     def clear_hand(self):
-        self.hands = [Hand(self)]
+        self.hands = [Hand(self, [], False, False, 0)]
 
     def place_bet(self, amount, hand):
         print("Player placed bet of $", amount)
