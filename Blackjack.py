@@ -539,7 +539,7 @@ def main():
                 number_of_decks=6,
                 penetration=0.75)
 
-    model = Model(starting_amount=0, rounds_to_be_played=10000, min_bet=10, is_manual=False)
+    model = Model(starting_amount=0, rounds_to_be_played=10000, min_bet=10, is_manual=True)
     dealer = Dealer(game=game)
     player = Player(model)
 
