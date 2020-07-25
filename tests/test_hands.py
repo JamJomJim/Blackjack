@@ -36,8 +36,12 @@ class TestHands(unittest.TestCase):
             False
         )
 
-    def test_is_splitable(self):
-        self.assertEqual(Hand(None, [Card("clubs", "ace"), Card("clubs", "ace")], False, False, 0).is_splitable(), True)
+    def test_is_splittable(self):
+        self.assertEqual(Hand(None, [Card("clubs", "ace"), Card("clubs", "ace")], False, False, 0).is_splittable(), True)
+
+    def test_is_natural_21(self):
+        self.assertEqual(Hand(None, [Card("clubs", "ace"), Card("clubs", "ace")], False, False, 0).is_natural_21(), False)
+        self.assertEqual(Hand(None, [Card("clubs", "ace"), Card("clubs", 10)], False, False, 0).is_natural_21(), True)
 
 
 if __name__ == '__main__':

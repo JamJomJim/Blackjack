@@ -17,11 +17,3 @@ class Shoe:
     def shuffle(self):
         random.shuffle(self.cards)
 
-    def get_count(self):
-        count = 0
-        for card in self.cards:
-            if card.rank in [2, 3, 4, 5, 6]:
-                count += 1
-            elif card.rank in [10, "ace"]:
-                count -= 1
-        return count

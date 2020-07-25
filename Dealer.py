@@ -21,6 +21,7 @@ class Dealer(Player):
                 self.shoe.running_count += 1
             elif card.rank in [10, "ace"]:
                 self.shoe.running_count -= 1
+        self.shoe.true_count = self.shoe.running_count / (len(self.shoe.cards) / 52)
         hand.cards += dealt_cards
         self.shoe.cards = self.shoe.cards[number_cards:]
 

@@ -46,7 +46,13 @@ class Hand:
         else:
             return False
 
-    def is_splitable(self):
+    def is_natural_21(self):
+        value = 0
+        for card in self.cards[0:2]:
+            value += 11 if card.rank == "ace" else card.rank
+        return value == 21
+
+    def is_splittable(self):
         return len(self.cards) == 2 and self.cards[0].rank == self.cards[1].rank
 
     def hit(self, dealer):

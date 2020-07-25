@@ -17,3 +17,9 @@ class Player:
         print("Player placed bet of $", amount)
         self.bankroll -= amount
         hand.current_bet += amount
+
+    def determine_bet(self, count):
+        return self.bet * (1 if count <= 2 else count)
+
+    def has_natural_21(self):
+        self.hands.cards[0:2]

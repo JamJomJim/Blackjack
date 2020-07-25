@@ -40,11 +40,11 @@ def find_best_move(count, player_hand, dealer_hand):
     current_count = round(count + 3)
     # The strategy tabled are for a true count from -3 to 3. This ensures that the current count is within those bounds
     if current_count > 3:
-        current_count = 3
+        current_count = 6
     elif current_count < -3:
-        current_count = -3
+        current_count = 0
 
-    if player_hand.is_splitable():
+    if player_hand.is_splittable():
         p_index = abs((9 if player_hand.cards[0].rank == "ace" else player_hand.cards[0].rank - 2) - 9)
         if splitting_hand_strategy[current_count][p_index][d_index] == "Y":
             return "split"
@@ -69,15 +69,16 @@ def main():
                 surrender=True,
                 insurance=True,
                 number_of_decks=6,
+                # Needs to be at a point where the dealer won't run out of cards. Otherwise bugs.
                 penetration=0.75)
 
-    model = Model(starting_amount=0, rounds_to_be_played=10000, min_bet=10, is_manual=False)
+    model = Model(starting_amount=0, rounds_to_be_played=5, min_bet=10, is_manual=False)
     dealer = Dealer(game=game, model=model)
     player = Player(model)
 
     while game.current_round < model.rounds_to_be_played:
 
-        player.place_bet(amount=player.bet, hand=player.hands[0])
+        player.place_bet(amount=player.determine_bet(dealer.shoe.true_count), hand=player.hands[0])
 
         dealer.deal(hand=player.hands[0], number_cards=2)
         player.display_cards()
@@ -118,7 +119,7 @@ def main():
                     elif move == "hit":
                         hand.hit(dealer)
                         print("Player hits.")
-                    elif move == "split" and hand.is_splitable():
+                    elif move == "split" and hand.is_splittable():
                         print("Player splits.")
                         hand.split(dealer)
                         player.display_cards()
@@ -169,10 +170,14 @@ def main():
             print("Player has " + str(player_hand_val))
             print("Dealer has " + str(dealer_hand_val))
 
-            if player_hand_val == 21 and len(hand.cards) == 2 and not(dealer_hand_val == 21 and len(dealer.hands[0].cards) == 2):
-                player.bankroll += hand.current_bet * 2.5
-                print("Player Blackjack!!\n")
-                print("Player wins $" + str(hand.current_bet * 2.5), "\n")
+            if hand.is_natural_21():
+                if not(dealer.hands[0].is_natural_21()):
+                    player.bankroll += hand.current_bet * (1 + game.blackjack_payout)
+                    print("Player Blackjack!!\n")
+                    print("Player wins $" + str(hand.current_bet * game.blackjack_payout), "\n")
+                else:
+                    print("both have blackjacks")
+                    player.bankroll += hand.current_bet
 
             elif 21 >= dealer_hand_val > player_hand_val or player_hand_val == -1:
                 print("Dealer wins!\n")
@@ -203,10 +208,5 @@ def main():
 
 
 if __name__ == '__main__':
-    # total = 0
-    # for i in range(100):
-    #     total += main()
-    # print(total / 100)
-
     main()
 
