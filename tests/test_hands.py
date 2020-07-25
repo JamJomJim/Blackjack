@@ -36,6 +36,9 @@ class TestHands(unittest.TestCase):
             False
         )
 
+    def test_is_splitable(self):
+        self.assertEqual(Hand(None, [Card("clubs", "ace"), Card("clubs", "ace")], False, False, 0).is_splitable(), True)
+
 
 if __name__ == '__main__':
     unittest.main()

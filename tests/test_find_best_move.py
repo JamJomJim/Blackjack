@@ -21,6 +21,13 @@ class TestFindBestMove(unittest.TestCase):
             ),
             "stand"
         )
+        self.assertEqual(
+            find_best_move(
+                Hand(None, [Card("spades", "ace"), Card("spades", "ace")], False, False, 0),
+                Hand(None, [Card("spades", 6), Card("spades", 3)], False, False, 0)
+            ),
+            "split"
+        )
 
 
 if __name__ == '__main__':

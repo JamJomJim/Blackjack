@@ -38,17 +38,15 @@ class Model:
 def find_best_move(player_hand, dealer_hand):
     d_index = 9 if dealer_hand.cards[0].rank == "ace" else dealer_hand.cards[0].rank - 2
 
-    # can the hand be split
     if player_hand.is_splitable():
-        p_index = abs(player_hand.get_value() - 11)
+        p_index = abs((9 if player_hand.cards[0].rank == "ace" else player_hand.cards[0].rank - 2) - 9)
         if splitting_hand_strategy[3][p_index][d_index] == "Y":
             return "split"
 
     p_index = abs(player_hand.get_value() - 20)
-    # If the hand is soft
     if player_hand.is_soft():
         best_move = soft_hand_strategy[3][p_index][d_index]
-    # If the hand is hard
+
     else:
         best_move = hard_hand_strategy[3][p_index][d_index]
 
@@ -106,7 +104,7 @@ def main():
                     if model.is_manual:
                         move = input("What do you want to do?\n")
                     else:
-                        move = find_best_move(shoe=dealer.shoe, player_hand=hand, dealer_hand=dealer.hands[0])
+                        move = find_best_move(player_hand=hand, dealer_hand=dealer.hands[0])
 
                     if move == "stand":
                         print("Player Stands.")
@@ -134,7 +132,7 @@ def main():
         # Dealer's turn
         dealer_done = False
         while not dealer_done:
-            dealer_hand_val = dealer.hands.get_value()
+            dealer_hand_val = dealer.hands[0].get_value()
             print("Dealer hand: ", dealer.hands)
 
             if dealer_hand_val == 21:
@@ -153,21 +151,21 @@ def main():
                     move = "stand"
 
                 if move == "stand":
-                    dealer.hands.stand()
+                    dealer.hands[0].stand()
                     dealer_done = True
-                    print("Dealer stands with", dealer.hands.get_value())
+                    print("Dealer stands with", dealer.hands[0].get_value())
                 else:
-                    dealer.hands.hit(dealer)
-                    print("Dealer hits to make", dealer.hands.get_value())
+                    dealer.hands[0].hit(dealer)
+                    print("Dealer hits to make", dealer.hands[0].get_value())
 
         for hand in player.hands:
             player_hand_val = hand.get_value()
-            dealer_hand_val = dealer.hands.get_value()
+            dealer_hand_val = dealer.hands[0].get_value()
 
             print("Player has " + str(player_hand_val))
             print("Dealer has " + str(dealer_hand_val))
 
-            if player_hand_val == 21 and len(hand.cards) == 2 and not(dealer_hand_val == 21 and len(dealer.hands.cards) == 2):
+            if player_hand_val == 21 and len(hand.cards) == 2 and not(dealer_hand_val == 21 and len(dealer.hands[0].cards) == 2):
                 player.bankroll += hand.current_bet * 2.5
                 print("Player Blackjack!!\n")
                 print("Player wins $" + str(hand.current_bet * 2.5), "\n")
@@ -191,7 +189,7 @@ def main():
 
         if len(dealer.shoe.cards) / (game.number_of_decks * 52) < (1 - game.penetration):
             print("New Deck!")
-            dealer.shoe = Shoe(dealer)
+            dealer.new_shoe()
 
         game.current_round += 1
 
