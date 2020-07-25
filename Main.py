@@ -2,7 +2,6 @@ import time
 
 from Dealer import Dealer
 from Player import Player
-from Shoe import Shoe
 from basic_strategy.hard_hand_strategy import hard_hand_strategy
 from basic_strategy.soft_hand_strategy import soft_hand_strategy
 from basic_strategy.splitting_hand_strategy import splitting_hand_strategy
@@ -35,20 +34,27 @@ class Model:
         self.is_manual = is_manual
 
 
-def find_best_move(player_hand, dealer_hand):
+def find_best_move(count, player_hand, dealer_hand):
     d_index = 9 if dealer_hand.cards[0].rank == "ace" else dealer_hand.cards[0].rank - 2
+
+    current_count = round(count + 3)
+    # The strategy tabled are for a true count from -3 to 3. This ensures that the current count is within those bounds
+    if current_count > 3:
+        current_count = 3
+    elif current_count < -3:
+        current_count = -3
 
     if player_hand.is_splitable():
         p_index = abs((9 if player_hand.cards[0].rank == "ace" else player_hand.cards[0].rank - 2) - 9)
-        if splitting_hand_strategy[3][p_index][d_index] == "Y":
+        if splitting_hand_strategy[current_count][p_index][d_index] == "Y":
             return "split"
 
     p_index = abs(player_hand.get_value() - 20)
     if player_hand.is_soft():
-        best_move = soft_hand_strategy[3][p_index][d_index]
+        best_move = soft_hand_strategy[current_count][p_index][d_index]
 
     else:
-        best_move = hard_hand_strategy[3][p_index][d_index]
+        best_move = hard_hand_strategy[current_count][p_index][d_index]
 
     if best_move == "double" and (len(player_hand.cards) > 2 or player_hand.has_split):
         best_move = "hit"
@@ -74,7 +80,6 @@ def main():
         player.place_bet(amount=player.bet, hand=player.hands[0])
 
         dealer.deal(hand=player.hands[0], number_cards=2)
-        # player.hands[0].cards = [Card("spades", "ace"), Card("spades", "ace")]
         player.display_cards()
 
         dealer.deal(hand=dealer.hands[0], number_cards=2)
@@ -104,7 +109,7 @@ def main():
                     if model.is_manual:
                         move = input("What do you want to do?\n")
                     else:
-                        move = find_best_move(player_hand=hand, dealer_hand=dealer.hands[0])
+                        move = find_best_move(dealer.shoe.true_count, player_hand=hand, dealer_hand=dealer.hands[0])
 
                     if move == "stand":
                         print("Player Stands.")
@@ -113,7 +118,7 @@ def main():
                     elif move == "hit":
                         hand.hit(dealer)
                         print("Player hits.")
-                    elif move == "split":
+                    elif move == "split" and hand.is_splitable():
                         print("Player splits.")
                         hand.split(dealer)
                         player.display_cards()
@@ -127,7 +132,7 @@ def main():
                         print("No surrender yet")
                         hand_done = True
                     else:
-                        print("you can't do that")
+                        raise ValueError('An invalid move was made.')
 
         # Dealer's turn
         dealer_done = False
@@ -142,7 +147,6 @@ def main():
                 print("Dealer busts with", dealer_hand_val)
                 dealer_done = True
             else:
-                # if the dealer hits on a soft17 or whatever, this is searching for a card instead of a rank
                 if game.dealer_hit_soft17 and dealer_hand_val == 17 and dealer.hands.cards.is_soft():
                     move = "hit"
                 elif dealer_hand_val <= 16:
