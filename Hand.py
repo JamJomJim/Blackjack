@@ -2,6 +2,7 @@ class Hand:
     def __init__(self, owner, cards, has_split, has_split_aces, current_bet):
         self.owner = owner
         self.cards = cards
+        self.has_surrendered = False
         self.has_split = has_split
         self.has_split_aces = has_split_aces
         self.current_bet = current_bet
@@ -58,17 +59,17 @@ class Hand:
     def hit(self, dealer):
         dealer.deal(hand=self, number_cards=1)
 
-    def double(self, dealer):
-        self.owner.place_bet(self.current_bet, self)
+    def double(self, dealer, model):
+        self.owner.place_bet(self.current_bet, self, model)
         dealer.deal(hand=self, number_cards=1)
 
-    def split(self, dealer):
+    def split(self, dealer, model):
 
         new_hand = Hand(self.owner, [], False, False, 0)
         new_hand.has_split = True
         new_hand.cards = [self.cards[1]]
         dealer.deal(hand=new_hand, number_cards=1)
-        new_hand.owner.place_bet(self.current_bet, new_hand)
+        new_hand.owner.place_bet(self.current_bet, new_hand, model)
 
         self.cards = self.cards[0:1]
         self.has_split = True
@@ -82,7 +83,8 @@ class Hand:
 
     def surrender(self, game):
         game.num_surrender += 1
-        self.stand()
+        self.owner.bankroll += self.current_bet / 2
+        self.has_surrendered = True
 
     def stand(self):
         pass

@@ -8,13 +8,15 @@ class Player:
         self.base_bet = base_bet
 
     def display_cards(self):
-        print("Player has", self.hands)
+        return
+        # print("Player has", self.hands)
 
     def clear_hand(self):
         self.hands = [Hand(self, [], False, False, 0)]
 
-    def place_bet(self, amount, hand):
-        print("Player placed bet of $", amount)
+    def place_bet(self, amount, hand, model):
+        # print("Player placed bet of $", amount)
+        model.total_bet += amount
         self.bankroll -= amount
         hand.current_bet += amount
 
