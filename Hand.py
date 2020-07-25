@@ -46,6 +46,9 @@ class Hand:
         else:
             return False
 
+    def is_splitable(self):
+        return len(self.cards) == 2 and self.cards[0].rank == self.cards[1].rank
+
     def hit(self, dealer):
         dealer.deal(hand=self, number_cards=1)
 
