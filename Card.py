@@ -7,7 +7,7 @@ class Card:
         return str(self.rank) + " of " + self.suit
 
     def __repr__(self):
-        return str(self.rank) + " of " + self.suit
+        return "Card(\"" + str(self.suit) + "\", " + str(self.rank) + ")"
 
     def display_suit(self):
         print(" ", self.suit)
