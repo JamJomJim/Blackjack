@@ -4,9 +4,9 @@ from Shoe import Shoe
 
 
 class Dealer(Player):
-    def __init__(self, game, model):
-        super().__init__(model)
-        self.game = game
+    def __init__(self, number_of_decks):
+        super().__init__(0, 0)
+        self.number_of_decks = number_of_decks
         self.hands = [Hand(self, [], False, False, 0)]
         self.shoe = None
         self.new_shoe()
@@ -26,5 +26,5 @@ class Dealer(Player):
         self.shoe.cards = self.shoe.cards[number_cards:]
 
     def new_shoe(self):
-        self.shoe = Shoe(self.game.number_of_decks)
+        self.shoe = Shoe(self.number_of_decks)
         self.shoe.shuffle()

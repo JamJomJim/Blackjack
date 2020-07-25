@@ -2,10 +2,10 @@ from Hand import Hand
 
 
 class Player:
-    def __init__(self, model):
+    def __init__(self, starting_amount, base_bet):
         self.hands = [Hand(self, [], False, False, 0)]
-        self.bankroll = model.starting_amount
-        self.bet = model.min_bet
+        self.bankroll = starting_amount
+        self.base_bet = base_bet
 
     def display_cards(self):
         print("Player has", self.hands)
@@ -19,7 +19,4 @@ class Player:
         hand.current_bet += amount
 
     def determine_bet(self, count):
-        return self.bet * (1 if count <= 2 else count)
-
-    def has_natural_21(self):
-        self.hands.cards[0:2]
+        return self.base_bet * (1 if count <= 2 else count * 3)

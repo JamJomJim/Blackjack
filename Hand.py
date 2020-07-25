@@ -59,7 +59,7 @@ class Hand:
         dealer.deal(hand=self, number_cards=1)
 
     def double(self, dealer):
-        self.owner.place_bet(self.owner.bet, self)
+        self.owner.place_bet(self.current_bet, self)
         dealer.deal(hand=self, number_cards=1)
 
     def split(self, dealer):
@@ -68,7 +68,7 @@ class Hand:
         new_hand.has_split = True
         new_hand.cards = [self.cards[1]]
         dealer.deal(hand=new_hand, number_cards=1)
-        new_hand.owner.place_bet(self.owner.bet, new_hand)
+        new_hand.owner.place_bet(self.current_bet, new_hand)
 
         self.cards = self.cards[0:1]
         self.has_split = True

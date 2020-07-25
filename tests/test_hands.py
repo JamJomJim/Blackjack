@@ -37,6 +37,8 @@ class TestHands(unittest.TestCase):
         )
 
     def test_is_splittable(self):
+        self.assertEqual(Hand(None, [Card("clubs", 3), Card("clubs", "ace")], False, False, 0).is_splittable(), False)
+        self.assertEqual(Hand(None, [Card("clubs", 10), Card("clubs", 10)], False, False, 0).is_splittable(), True)
         self.assertEqual(Hand(None, [Card("clubs", "ace"), Card("clubs", "ace")], False, False, 0).is_splittable(), True)
 
     def test_is_natural_21(self):

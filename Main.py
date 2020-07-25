@@ -72,9 +72,9 @@ def main():
                 # Needs to be at a point where the dealer won't run out of cards. Otherwise bugs.
                 penetration=0.75)
 
-    model = Model(starting_amount=0, rounds_to_be_played=5, min_bet=10, is_manual=False)
-    dealer = Dealer(game=game, model=model)
-    player = Player(model)
+    model = Model(starting_amount=0, rounds_to_be_played=5000, min_bet=10, is_manual=False)
+    dealer = Dealer(number_of_decks=game.number_of_decks)
+    player = Player(starting_amount=model.starting_amount, base_bet=model.min_bet)
 
     while game.current_round < model.rounds_to_be_played:
 
