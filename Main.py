@@ -67,7 +67,7 @@ class Card:
     def __repr__(self):
         return str(self.rank) + " of " + self.suit
 
-    def displaysuit(self):
+    def display_suit(self):
         print(" ", self.suit)
 
 
@@ -78,6 +78,46 @@ class Hand:
         self.has_split = has_split
         self.has_split_aces = has_split_aces
         self.current_bet = current_bet
+
+    def get_value(self):
+        possible_values = [0]
+        # this essentially sets up a binomial tree with all the possible values.
+        for card in self.cards:
+            if card.rank == "ace":
+                temp_values = list(possible_values)
+                for value in possible_values:
+                    temp_values.append(value + 1)
+                    temp_values.append(value + 11)
+                    temp_values.remove(value)
+                possible_values = temp_values
+            else:
+                for i, value in enumerate(possible_values):
+                    possible_values[i] += card.rank
+        # lambda sets up an anonymous function that returns a bool.
+        # filter returns the values in possible_values that satisfy this function.
+        # these values are then turned into a list, and possible_values is set to that list.
+        possible_values = list(filter(lambda hand_value: hand_value <= 21, possible_values))
+        # the highest valid hand value is then returned.
+        # if the player is bust, return -1.
+        return max(possible_values + [-1])
+
+    def is_soft(self):
+        possible_values = [0]
+        for card in self.cards:
+            if card.rank == "ace":
+                temp_values = list(possible_values)
+                for value in possible_values:
+                    temp_values.append(value + 1)
+                    temp_values.append(value + 11)
+                    temp_values.remove(value)
+                possible_values = temp_values
+            else:
+                for i, value in enumerate(possible_values):
+                    possible_values[i] += card.rank
+        if len(list(filter(lambda hand_value: hand_value <= 21, possible_values))) > 1:
+            return True
+        else:
+            return False
 
     def hit(self, dealer):
         dealer.deal(hand=self, number_cards=1)
@@ -162,7 +202,7 @@ class Player:
 
 def find_best_move(shoe, player_hand, dealer_hand):
     player_cards = player_hand.cards
-    d_index = check_value(dealer_hand[0:1]) - 2
+    d_index = dealer_hand[0:1].get_value() - 2
     current_count = round(shoe.true_count)
 
     # The strategy tabled are for a true count from -3 to 3. This ensures that the current count is within those bounds
@@ -173,13 +213,13 @@ def find_best_move(shoe, player_hand, dealer_hand):
 
     # can the hand be split
     if len(player_cards) == 2 and player_cards[0].rank == player_cards[1].rank:
-        p_index = abs(check_value(player_cards[0:1]) - 11)
+        p_index = abs(player_cards[0:1].get_value() - 11)
         if splitting_hand_strategy[current_count][p_index][d_index] == "Y":
             return "split"
 
-    p_index = abs(check_value(player_cards) - 20)
+    p_index = abs(player_hand.get_value() - 20)
     # If the hand is soft
-    if is_soft(player_cards):
+    if player_cards.is_soft():
         best_move = soft_hand_strategy[current_count][p_index][d_index]
     # If the hand is hard
     else:
@@ -189,48 +229,6 @@ def find_best_move(shoe, player_hand, dealer_hand):
         best_move = "hit"
 
     return best_move
-
-
-def check_value(hand):
-    possible_values = [0]
-    # this essentially sets up a binomial tree with all the possible values.
-    for card in hand:
-        if card.rank == "ace":
-            temp_values = list(possible_values)
-            for value in possible_values:
-                temp_values.append(value + 1)
-                temp_values.append(value + 11)
-                temp_values.remove(value)
-            possible_values = temp_values
-        else:
-            for i, value in enumerate(possible_values):
-                possible_values[i] += card.rank
-    # lambda sets up an anonymous function that returns a bool.
-    # filter returns the values in possible_values that satisfy this function.
-    # these values are then turned into a list, and possible_values is set to that list.
-    possible_values = list(filter(lambda hand_value: hand_value <= 21, possible_values))
-    # the highest valid hand value is then returned.
-    # if the player is bust, return -1.
-    return max(possible_values + [-1])
-
-
-def is_soft(hand):
-    possible_values = [0]
-    for card in hand:
-        if card.rank == "ace":
-            temp_values = list(possible_values)
-            for value in possible_values:
-                temp_values.append(value + 1)
-                temp_values.append(value + 11)
-                temp_values.remove(value)
-            possible_values = temp_values
-        else:
-            for i, value in enumerate(possible_values):
-                possible_values[i] += card.rank
-    if len(list(filter(lambda hand_value: hand_value <= 21, possible_values))) > 1:
-        return True
-    else:
-        return False
 
 
 def get_count(cards):
@@ -271,7 +269,7 @@ def main():
 
         # Checks for dealer blackjack
         # Verify these rules
-        if check_value(dealer.hand.cards) == 21:
+        if dealer.hand.get_value() == 21:
             print("Dealer Blackjack!")
             continue
 
@@ -279,7 +277,7 @@ def main():
         for hand in player.hands:
             hand_done = False
             while not hand_done and not hand.has_split_aces:
-                player_hand_val = check_value(hand.cards)
+                player_hand_val = hand.get_value()
                 print("Player has ", hand, "worth", player_hand_val)
                 if player_hand_val == 21:
                     print("Player has 21!")
@@ -307,7 +305,7 @@ def main():
                     elif move == "double":
                         print("Player doubles.")
                         hand.double(dealer=dealer)
-                        print("Player has ", hand, "worth", check_value(hand.cards))
+                        print("Player has ", hand, "worth", hand.get_value())
                         hand_done = True
                     elif move == "surrender":
                         hand.surrender(game)
@@ -319,7 +317,7 @@ def main():
         # Dealer's turn
         dealer_done = False
         while not dealer_done:
-            dealer_hand_val = check_value(dealer.hand.cards)
+            dealer_hand_val = dealer.hand.get_value()
             print("Dealer hand: ", dealer.hand)
 
             if dealer_hand_val == 21:
@@ -330,7 +328,7 @@ def main():
                 dealer_done = True
             else:
                 # if the dealer hits on a soft17 or whatever, this is searching for a card instead of a rank
-                if game.dealer_hit_soft17 and dealer_hand_val == 17 and is_soft(dealer.hand.cards):
+                if game.dealer_hit_soft17 and dealer_hand_val == 17 and dealer.hand.cards.is_soft():
                     move = "hit"
                 elif dealer_hand_val <= 16:
                     move = "hit"
@@ -340,14 +338,14 @@ def main():
                 if move == "stand":
                     dealer.hand.stand()
                     dealer_done = True
-                    print("Dealer stands with", check_value(dealer.hand.cards))
+                    print("Dealer stands with", dealer.hand.get_value())
                 else:
                     dealer.hand.hit(dealer)
-                    print("Dealer hits to make", check_value(dealer.hand.cards))
+                    print("Dealer hits to make", dealer.hand.get_value())
 
         for hand in player.hands:
-            player_hand_val = check_value(hand.cards)
-            dealer_hand_val = check_value(dealer.hand.cards)
+            player_hand_val = hand.get_value()
+            dealer_hand_val = dealer.hand.get_value()
 
             print("Player has " + str(player_hand_val))
             print("Dealer has " + str(dealer_hand_val))
