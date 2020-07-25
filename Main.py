@@ -195,9 +195,9 @@ def main():
 
         print("Current bankroll: $", player.bankroll)
         print("Running count: " + str(dealer.shoe.running_count), "True count:" + str(dealer.shoe.true_count))
-        print("Cards remaining in deck: " + str(len(dealer.deck.cards)) + "\n")
+        print("Cards remaining in deck: " + str(len(dealer.shoe.cards)) + "\n")
 
-        if len(dealer.deck.cards) / (game.number_of_decks * 52) < (1 - game.penetration):
+        if len(dealer.shoe.cards) / (game.number_of_decks * 52) < (1 - game.penetration):
             print("New Deck!")
             dealer.shoe = Shoe(dealer)
 
