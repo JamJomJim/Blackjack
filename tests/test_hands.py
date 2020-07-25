@@ -1,5 +1,6 @@
 import unittest
-from Main import Hand, Card
+from Hand import Hand
+from Card import Card
 
 
 class TestHands(unittest.TestCase):

@@ -1,10 +1,11 @@
-import random
 import time
+
+from Dealer import Dealer
+from Player import Player
+from Shoe import Shoe
 from basic_strategy.hard_hand_strategy import hard_hand_strategy
 from basic_strategy.soft_hand_strategy import soft_hand_strategy
 from basic_strategy.splitting_hand_strategy import splitting_hand_strategy
-
-suits, ranks = ["hearts", "diamonds", "spades", "clubs"], [2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10, "ace"]
 
 
 class Game:
@@ -32,172 +33,6 @@ class Model:
         self.rounds_to_be_played = rounds_to_be_played
         self.min_bet = min_bet
         self.is_manual = is_manual
-
-
-class Deck:
-    def __init__(self, number_of_decks):
-        self.cards = []
-        for _ in range(number_of_decks):
-            for suit in suits:
-                for rank in ranks:
-                    self.cards.append(Card(suit, rank))
-
-    def display_cards(self):
-        print(self.cards)
-
-    def shuffle(self):
-        random.shuffle(self.cards)
-
-
-class Shoe:
-    def __init__(self, dealer):
-        self.running_count = 0
-        self.true_count = 0
-        dealer.new_shoe()
-
-
-class Card:
-    def __init__(self, suit, rank):
-        self.suit = suit
-        self.rank = rank
-
-    def __str__(self):
-        return str(self.rank) + " of " + self.suit
-
-    def __repr__(self):
-        return str(self.rank) + " of " + self.suit
-
-    def display_suit(self):
-        print(" ", self.suit)
-
-
-class Hand:
-    def __init__(self, owner, cards, has_split, has_split_aces, current_bet):
-        self.owner = owner
-        self.cards = cards
-        self.has_split = has_split
-        self.has_split_aces = has_split_aces
-        self.current_bet = current_bet
-
-    def get_value(self):
-        possible_values = [0]
-        # this essentially sets up a binomial tree with all the possible values.
-        for card in self.cards:
-            if card.rank == "ace":
-                temp_values = list(possible_values)
-                for value in possible_values:
-                    temp_values.append(value + 1)
-                    temp_values.append(value + 11)
-                    temp_values.remove(value)
-                possible_values = temp_values
-            else:
-                for i, value in enumerate(possible_values):
-                    possible_values[i] += card.rank
-        # lambda sets up an anonymous function that returns a bool.
-        # filter returns the values in possible_values that satisfy this function.
-        # these values are then turned into a list, and possible_values is set to that list.
-        possible_values = list(filter(lambda hand_value: hand_value <= 21, possible_values))
-        # the highest valid hand value is then returned.
-        # if the player is bust, return -1.
-        return max(possible_values + [-1])
-
-    def is_soft(self):
-        possible_values = [0]
-        for card in self.cards:
-            if card.rank == "ace":
-                temp_values = list(possible_values)
-                for value in possible_values:
-                    temp_values.append(value + 1)
-                    temp_values.append(value + 11)
-                    temp_values.remove(value)
-                possible_values = temp_values
-            else:
-                for i, value in enumerate(possible_values):
-                    possible_values[i] += card.rank
-        if len(list(filter(lambda hand_value: hand_value <= 21, possible_values))) > 1:
-            return True
-        else:
-            return False
-
-    def hit(self, dealer):
-        dealer.deal(hand=self, number_cards=1)
-
-    def double(self, dealer):
-        self.owner.place_bet(self.owner.bet, self)
-        dealer.deal(hand=self, number_cards=1)
-
-    def split(self, dealer):
-
-        new_hand = Hand(self.owner, [], False, False, 0)
-        new_hand.has_split = True
-        new_hand.cards = [self.cards[1]]
-        dealer.deal(hand=new_hand, number_cards=1)
-        new_hand.owner.place_bet(self.owner.bet, new_hand)
-
-        self.cards = self.cards[0:1]
-        self.has_split = True
-        dealer.deal(hand=self, number_cards=1)
-
-        if new_hand.cards[0].rank == "ace":
-            new_hand.has_split_aces = True
-            self.has_split_aces = True
-
-        self.owner.hands.append(new_hand)
-
-    def surrender(self, game):
-        game.num_surrender += 1
-        self.stand()
-
-    def stand(self):
-        pass
-
-    def __str__(self):
-        return str(self.cards)
-
-    def __repr__(self):
-        return str(self.cards)
-
-
-class Dealer:
-    def __init__(self, game):
-        self.game = game
-        self.deck = None
-        self.hand = Hand(self, [], False, False, 0)
-        self.shoe = Shoe(self)
-
-    def display_cards(self):
-        print("Dealer has", self.hand)
-
-    def deal(self, hand, number_cards):
-        hand.cards += self.deck.cards[0:number_cards]
-        self.shoe.running_count += get_count(self.deck.cards[0:number_cards])
-        self.shoe.true_count = self.shoe.running_count / self.game.number_of_decks
-        self.deck.cards = self.deck.cards[number_cards:]
-
-    def clear_hand(self):
-        self.hand = Hand(self, [], False, False, 0)
-
-    def new_shoe(self):
-        self.deck = Deck(self.game.number_of_decks)
-        self.deck.shuffle()
-
-
-class Player:
-    def __init__(self, model):
-        self.hands = [Hand(self, [], False, False, 0)]
-        self.bankroll = model.starting_amount
-        self.bet = model.min_bet
-
-    def display_cards(self):
-        print("Player has", self.hands)
-
-    def clear_hand(self):
-        self.hands = [Hand(self, [], False, False, 0)]
-
-    def place_bet(self, amount, hand):
-        print("Player placed bet of $", amount)
-        self.bankroll -= amount
-        hand.current_bet += amount
 
 
 def find_best_move(shoe, player_hand, dealer_hand):
@@ -231,16 +66,6 @@ def find_best_move(shoe, player_hand, dealer_hand):
     return best_move
 
 
-def get_count(cards):
-    count = 0
-    for card in cards:
-        if card.rank in [2, 3, 4, 5, 6]:
-            count += 1
-        elif card.rank in [10, "ace"]:
-            count -= 1
-    return count
-
-
 def main():
     start = time.time()
     game = Game(blackjack_payout=1.5,
@@ -251,7 +76,7 @@ def main():
                 penetration=0.75)
 
     model = Model(starting_amount=0, rounds_to_be_played=10000, min_bet=10, is_manual=True)
-    dealer = Dealer(game=game)
+    dealer = Dealer(game=game, model=model)
     player = Player(model)
 
     while game.current_round < model.rounds_to_be_played:
