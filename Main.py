@@ -77,6 +77,13 @@ def find_best_move(count, player_hand, dealer_hand):
     return best_move
 
 
+def print_stats(player, model, time_played):
+    print(f"\nEnded with ${str(player.bankroll)} dollars")
+    print(model.total_bet)
+    print("{:.3%}".format(player.bankroll / model.total_bet))
+    print(f"{str(model.rounds_to_be_played)} hands in {str(time_played)} seconds!")
+
+
 def main():
     start = time.time()
     model = Model(
@@ -96,7 +103,6 @@ def main():
     player = Player(starting_amount=model.starting_amount, base_bet=model.min_bet)
 
     while game.current_round < model.rounds_to_be_played:
-
         player.place_bet(
             amount=player.determine_bet(dealer.shoe.true_count),
             hand=player.hands[0],
@@ -104,10 +110,7 @@ def main():
         )
 
         dealer.deal(hand=player.hands[0], number_cards=2)
-
         dealer.deal(hand=dealer.hand, number_cards=2)
-
-        # print("\n")
 
         # Checks for dealer blackjack
         # Verify these rules
@@ -207,15 +210,7 @@ def main():
 
         game.current_round += 1
 
-    print("\nEnded with $" + str(player.bankroll) + " dollars")
-    print(model.total_bet)
-    print("{:.3%}".format(player.bankroll / model.total_bet))
-    print(
-        str(model.rounds_to_be_played)
-        + " hands in "
-        + str(round(time.time() - start, 4))
-        + " seconds!"
-    )
+    print_stats(player, model, time_played=round(time.time() - start, 4))
     return player.bankroll
 
 
