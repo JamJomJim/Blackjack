@@ -8,26 +8,21 @@ class Hand:
         self.current_bet = current_bet
 
     def get_value(self):
-        possible_values = [0]
-        # this essentially sets up a binomial tree with all the possible values.
+        value = 0
+        contains_ace = False
         for card in self.cards:
             if card.rank == "ace":
-                temp_values = list(possible_values)
-                for value in possible_values:
-                    temp_values.append(value + 1)
-                    temp_values.append(value + 11)
-                    temp_values.remove(value)
-                possible_values = temp_values
+                contains_ace = True
+                value += 1
             else:
-                for i, value in enumerate(possible_values):
-                    possible_values[i] += card.rank
-        # lambda sets up an anonymous function that returns a bool.
-        # filter returns the values in possible_values that satisfy this function.
-        # these values are then turned into a list, and possible_values is set to that list.
-        possible_values = list(filter(lambda hand_value: hand_value <= 21, possible_values))
-        # the highest valid hand value is then returned.
+                value += card.rank
+
+        if contains_ace and value <= 11:
+            value += 10
+
+        # the highest valid hand value is returned.
         # if the player is bust, return -1.
-        return max(possible_values + [-1])
+        return value if value <= 21 else -1
 
     def is_soft(self):
         possible_values = [0]
