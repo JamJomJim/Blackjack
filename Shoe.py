@@ -25,11 +25,7 @@ class Shoe:
     def __init__(self, number_of_decks):
         self.running_count = 0
         self.true_count = 0
-        self.cards = []
-        for _ in range(number_of_decks):
-            for suit in suits:
-                for rank in ranks:
-                    self.cards.append(Card(suit, rank))
+        self.cards = base_deck.copy() * number_of_decks
 
     def shuffle(self):
         random.shuffle(self.cards)

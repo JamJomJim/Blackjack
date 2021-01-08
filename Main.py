@@ -1,14 +1,22 @@
 import time
 
-from Dealer import Dealer
-from Player import Player
 from basic_strategy.hard_hand_strategy import hard_hand_strategy
 from basic_strategy.soft_hand_strategy import soft_hand_strategy
 from basic_strategy.splitting_hand_strategy import splitting_hand_strategy
+from Dealer import Dealer
+from Player import Player
 
 
 class Game:
-    def __init__(self, blackjack_payout, dealer_hit_soft17, surrender, insurance, number_of_decks, penetration):
+    def __init__(
+        self,
+        blackjack_payout,
+        dealer_hit_soft17,
+        surrender,
+        insurance,
+        number_of_decks,
+        penetration,
+    ):
         self.blackjack_payout = blackjack_payout
         self.dealer_hit_soft17 = dealer_hit_soft17
         self.surrender = surrender
@@ -46,7 +54,10 @@ def find_best_move(count, player_hand, dealer_hand):
         current_count = 0
 
     if player_hand.is_splittable():
-        p_index = abs((9 if player_hand.cards[0].rank == "ace" else player_hand.cards[0].rank - 2) - 9)
+        p_index = abs(
+            (9 if player_hand.cards[0].rank == "ace" else player_hand.cards[0].rank - 2)
+            - 9
+        )
         if splitting_hand_strategy[current_count][p_index][d_index] == "Y":
             return "split"
 
@@ -65,21 +76,29 @@ def find_best_move(count, player_hand, dealer_hand):
 
 def main():
     start = time.time()
-    model = Model(starting_amount=0, rounds_to_be_played=10000, min_bet=10, is_manual=False)
-    game = Game(blackjack_payout=1.5,
-                dealer_hit_soft17=False,
-                surrender=True,
-                insurance=True,
-                number_of_decks=4,
-                # Needs to be at a point where the dealer won't run out of cards. Otherwise bugs.
-                penetration=0.75)
+    model = Model(
+        starting_amount=0, rounds_to_be_played=10000000, min_bet=10, is_manual=False
+    )
+    game = Game(
+        blackjack_payout=1.5,
+        dealer_hit_soft17=False,
+        surrender=True,
+        insurance=True,
+        number_of_decks=4,
+        # Needs to be at a point where the dealer won't run out of cards. Otherwise bugs.
+        penetration=0.75,
+    )
 
     dealer = Dealer(number_of_decks=game.number_of_decks)
     player = Player(starting_amount=model.starting_amount, base_bet=model.min_bet)
 
     while game.current_round < model.rounds_to_be_played:
 
-        player.place_bet(amount=player.determine_bet(dealer.shoe.true_count), hand=player.hands[0], model=model)
+        player.place_bet(
+            amount=player.determine_bet(dealer.shoe.true_count),
+            hand=player.hands[0],
+            model=model,
+        )
 
         dealer.deal(hand=player.hands[0], number_cards=2)
         # player.display_cards()
@@ -111,7 +130,11 @@ def main():
                     if model.is_manual:
                         move = input("What do you want to do?\n")
                     else:
-                        move = find_best_move(dealer.shoe.true_count, player_hand=hand, dealer_hand=dealer.hands[0])
+                        move = find_best_move(
+                            dealer.shoe.true_count,
+                            player_hand=hand,
+                            dealer_hand=dealer.hands[0],
+                        )
 
                     if move == "stand":
                         # print("Player Stands.")
@@ -134,7 +157,7 @@ def main():
                         # print("No surrender yet")
                         hand_done = True
                     else:
-                        raise ValueError('An invalid move was made.')
+                        raise ValueError("An invalid move was made.")
 
         # Dealer's turn
         dealer_done = False
@@ -149,7 +172,11 @@ def main():
                 # print("Dealer busts with", dealer_hand_val)
                 dealer_done = True
             else:
-                if game.dealer_hit_soft17 and dealer_hand_val == 17 and dealer.hands.cards.is_soft():
+                if (
+                    game.dealer_hit_soft17
+                    and dealer_hand_val == 17
+                    and dealer.hands.cards.is_soft()
+                ):
                     move = "hit"
                 elif dealer_hand_val <= 16:
                     move = "hit"
@@ -175,7 +202,7 @@ def main():
             elif 21 >= dealer_hand_val > player_hand_val or player_hand_val == -1:
                 continue
             elif hand.is_natural_21():
-                if not(dealer.hands[0].is_natural_21()):
+                if not (dealer.hands[0].is_natural_21()):
                     player.bankroll += hand.current_bet * (1 + game.blackjack_payout)
                     # print("Player Blackjack!!\n")
                     # print("Player wins $" + str(hand.current_bet * game.blackjack_payout), "\n")
@@ -199,7 +226,9 @@ def main():
         # print("Running count: " + str(dealer.shoe.running_count), "True count:" + str(dealer.shoe.true_count))
         # print("Cards remaining in deck: " + str(len(dealer.shoe.cards)) + "\n")
 
-        if len(dealer.shoe.cards) / (game.number_of_decks * 52) < (1 - game.penetration):
+        if len(dealer.shoe.cards) / (game.number_of_decks * 52) < (
+            1 - game.penetration
+        ):
             # print("New Deck!")
             dealer.new_shoe()
 
@@ -207,12 +236,17 @@ def main():
 
     print("\nEnded with $" + str(player.bankroll) + " dollars")
     print(model.total_bet)
-    print('{:.3%}'.format(player.bankroll/model.total_bet))
-    print(str(model.rounds_to_be_played) + " hands in " + str(round(time.time() - start, 4)) + " seconds!")
+    print("{:.3%}".format(player.bankroll / model.total_bet))
+    print(
+        str(model.rounds_to_be_played)
+        + " hands in "
+        + str(round(time.time() - start, 4))
+        + " seconds!"
+    )
     return player.bankroll
 
 
-if __name__ == '__main__':
-    import cProfile
-    cProfile.run('main()')
-
+if __name__ == "__main__":
+    # import cProfile
+    # cProfile.run('main()')
+    main()
