@@ -66,6 +66,36 @@ class TestHands(unittest.TestCase):
             ).get_value(),
             16,
         )
+        self.assertEqual(
+            Hand(
+                None,
+                [
+                    Card("spades", 10),
+                    Card("spades", 10),
+                    Card("spades", "ace"),
+                    Card("spades", "ace"),
+                ],
+                False,
+                False,
+                0,
+            ).get_value(),
+            -1,
+        )
+        self.assertEqual(
+            Hand(
+                None,
+                [
+                    Card("spades", 10),
+                    Card("spades", 10),
+                    Card("spades", 5),
+                    Card("spades", 5),
+                ],
+                False,
+                False,
+                0,
+            ).get_value(),
+            -1,
+        )
 
     def test_is_soft(self):
         self.assertEqual(
