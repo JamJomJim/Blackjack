@@ -33,11 +33,11 @@ class TestFindBestMove(unittest.TestCase):
         )
         self.assertEqual(
             find_best_move(count=0, player_hand=self.hard_17, dealer_hand=self.soft_16),
-            "stand",
+            Move.STAND.value,
         )
         self.assertEqual(
             find_best_move(count=0, player_hand=self.ace_pair, dealer_hand=self.hard_9),
-            "split",
+            Move.SPLIT.value,
         )
 
 
