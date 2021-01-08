@@ -5,10 +5,9 @@ from Player import Player
 
 
 class TestFindBestMove(unittest.TestCase):
-
     def test_new_shoe(self):
         dealer = Dealer(number_of_decks=4)
-        self.assertEqual(len(dealer.shoe.cards), 4*52)
+        self.assertEqual(len(dealer.shoe.cards), 4 * 52)
 
     def test_deal(self):
         dealer = Dealer(number_of_decks=4)
@@ -22,5 +21,5 @@ class TestFindBestMove(unittest.TestCase):
         self.assertEqual(player.hands[0].cards, deck_copy[2:4])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

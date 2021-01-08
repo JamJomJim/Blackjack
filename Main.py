@@ -175,7 +175,7 @@ def main():
                 if (
                     game.dealer_hit_soft17
                     and dealer_hand_val == 17
-                    and dealer.hands.cards.is_soft()
+                    and dealer.hands[0].cards.is_soft()
                 ):
                     move = "hit"
                 elif dealer_hand_val <= 16:
