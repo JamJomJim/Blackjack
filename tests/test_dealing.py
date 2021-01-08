@@ -14,10 +14,10 @@ class TestFindBestMove(unittest.TestCase):
         player = Player(base_bet=10, starting_amount=0)
 
         deck_copy = dealer.shoe.cards.copy()
-        dealer.deal(dealer.hands[0], 2)
+        dealer.deal(dealer.hand, 2)
         dealer.deal(player.hands[0], 2)
         self.assertEqual(len(dealer.shoe.cards), 4 * 52 - 4)
-        self.assertEqual(dealer.hands[0].cards, deck_copy[0:2])
+        self.assertEqual(dealer.hand.cards, deck_copy[0:2])
         self.assertEqual(player.hands[0].cards, deck_copy[2:4])
 
 

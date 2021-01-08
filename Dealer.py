@@ -3,16 +3,18 @@ from Player import Player
 from Shoe import Shoe
 
 
-class Dealer(Player):
+class Dealer:
     def __init__(self, number_of_decks):
-        super().__init__(0, 0)
         self.number_of_decks = number_of_decks
-        self.hands = [Hand(self, [], False, False, 0)]
+        self.hand = Hand(self, [], False, False, 0)
         self.shoe = None
         self.new_shoe()
 
+    def clear_hand(self):
+        self.hand.cards = []
+
     def display_cards(self):
-        print("Dealer has", self.hands)
+        print("Dealer has", self.hand)
 
     def deal(self, hand, number_cards):
         dealt_cards = self.shoe.cards[0:number_cards]

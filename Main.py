@@ -80,7 +80,7 @@ def find_best_move(count, player_hand, dealer_hand):
 def main():
     start = time.time()
     model = Model(
-        starting_amount=0, rounds_to_be_played=50000, min_bet=10, is_manual=False
+        starting_amount=0, rounds_to_be_played=1000000, min_bet=10, is_manual=False
     )
     game = Game(
         blackjack_payout=1.5,
@@ -105,13 +105,13 @@ def main():
 
         dealer.deal(hand=player.hands[0], number_cards=2)
 
-        dealer.deal(hand=dealer.hands[0], number_cards=2)
+        dealer.deal(hand=dealer.hand, number_cards=2)
 
         # print("\n")
 
         # Checks for dealer blackjack
         # Verify these rules
-        if dealer.hands[0].get_value() == 21:
+        if dealer.hand.get_value() == 21:
             continue
 
         # Player's turn
@@ -130,7 +130,7 @@ def main():
                         move = find_best_move(
                             dealer.shoe.true_count,
                             player_hand=hand,
-                            dealer_hand=dealer.hands[0],
+                            dealer_hand=dealer.hand,
                         )
 
                     if move == Move.STAND.value:
@@ -152,7 +152,7 @@ def main():
         # Dealer's turn
         dealer_done = False
         while not dealer_done:
-            dealer_hand_val = dealer.hands[0].get_value()
+            dealer_hand_val = dealer.hand.get_value()
 
             if dealer_hand_val == 21:
                 dealer_done = True
@@ -162,7 +162,7 @@ def main():
                 if (
                     game.dealer_hit_soft17
                     and dealer_hand_val == 17
-                    and dealer.hands[0].cards.is_soft()
+                    and dealer.hand.cards.is_soft()
                 ):
                     move = Move.HIT.value
                 elif dealer_hand_val <= 16:
@@ -171,21 +171,21 @@ def main():
                     move = Move.STAND.value
 
                 if move == Move.STAND.value:
-                    dealer.hands[0].stand()
+                    dealer.hand.stand()
                     dealer_done = True
                 else:
-                    dealer.hands[0].hit(dealer)
+                    dealer.hand.hit(dealer)
 
         for hand in player.hands:
             player_hand_val = hand.get_value()
-            dealer_hand_val = dealer.hands[0].get_value()
+            dealer_hand_val = dealer.hand.get_value()
 
             if hand.has_surrendered:
                 continue
             elif 21 >= dealer_hand_val > player_hand_val or player_hand_val == -1:
                 continue
             elif hand.is_natural_21():
-                if not (dealer.hands[0].is_natural_21()):
+                if not (dealer.hand.is_natural_21()):
                     player.bankroll += hand.current_bet * (1 + game.blackjack_payout)
                 else:
                     player.bankroll += hand.current_bet
