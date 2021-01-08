@@ -25,22 +25,15 @@ class Hand:
         return value if value <= 21 else -1
 
     def is_soft(self):
-        possible_values = [0]
+        value = 0
+        no_ace_yet = True
         for card in self.cards:
-            if card.rank == "ace":
-                temp_values = list(possible_values)
-                for value in possible_values:
-                    temp_values.append(value + 1)
-                    temp_values.append(value + 11)
-                    temp_values.remove(value)
-                possible_values = temp_values
+            if card.rank == "ace" and no_ace_yet:
+                no_ace_yet = False
+                value += 11
             else:
-                for i, value in enumerate(possible_values):
-                    possible_values[i] += card.rank
-        if len(list(filter(lambda hand_value: hand_value <= 21, possible_values))) > 1:
-            return True
-        else:
-            return False
+                value += 1 if card.rank == "ace" else card.rank
+        return True if value <= 21 and not no_ace_yet else False
 
     def is_natural_21(self):
         value = 0
