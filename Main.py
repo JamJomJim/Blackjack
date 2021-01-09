@@ -132,6 +132,28 @@ def print_stats(player, model, time_played):
     print(f"{str(model.rounds_to_be_played)} hands in {str(time_played)} seconds!")
 
 
+def evaluate_player_hand(hand, dealer_hand_val, dealer_natural_21, player, game):
+    player_hand_val = hand.get_value()
+
+    if (
+        player_hand_val == -1
+        or 21 >= dealer_hand_val > player_hand_val
+        or hand.has_surrendered
+    ):
+        return
+
+    if hand.is_natural_21():
+        if dealer_natural_21:
+            player.bankroll += hand.current_bet
+        else:
+            player.bankroll += hand.current_bet * (1 + game.blackjack_payout)
+
+    elif dealer_hand_val < player_hand_val <= 21:
+        player.bankroll += hand.current_bet * 2
+    else:
+        player.bankroll += hand.current_bet
+
+
 def main():
     start = time.time()
     model = Model(
@@ -166,33 +188,13 @@ def main():
         if dealer.hand.get_value() == 21:
             continue
 
-        # Player's turn
-        for hand in player.hands:
-            handle_player_hand_turn(model, dealer, hand)
-
-        # Dealer's turn
         handle_dealer_turn(dealer, game)
 
+        dealer_hand_val = dealer.hand.get_value()
+        dealer_natural_21 = dealer.hand.is_natural_21()
         for hand in player.hands:
-            player_hand_val = hand.get_value()
-            dealer_hand_val = dealer.hand.get_value()
-
-            if (
-                player_hand_val == -1
-                or 21 >= dealer_hand_val > player_hand_val
-                or hand.has_surrendered
-            ):
-                continue
-            elif hand.is_natural_21():
-                if dealer.hand.is_natural_21():
-                    player.bankroll += hand.current_bet
-                else:
-                    player.bankroll += hand.current_bet * (1 + game.blackjack_payout)
-
-            elif dealer_hand_val < player_hand_val <= 21:
-                player.bankroll += hand.current_bet * 2
-            else:
-                player.bankroll += hand.current_bet
+            handle_player_hand_turn(model, dealer, hand)
+            evaluate_player_hand(hand, dealer_hand_val, dealer_natural_21, player, game)
 
         player.clear_hand()
         dealer.clear_hand()
