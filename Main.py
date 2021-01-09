@@ -7,31 +7,23 @@ from Dealer import Dealer
 from Player import Player
 
 
-class Game:
+class Rules:
     def __init__(
         self,
         blackjack_payout,
-        dealer_hit_soft17,
+        dealer_hit_soft_17,
         surrender,
         insurance,
         number_of_decks,
         penetration,
     ):
         self.blackjack_payout = blackjack_payout
-        self.dealer_hit_soft17 = dealer_hit_soft17
+        self.dealer_hit_soft_17 = dealer_hit_soft_17
         self.surrender = surrender
         self.insurance = insurance
         self.number_of_decks = number_of_decks
+        # Needs to be at a point where the dealer won't run out of cards. Otherwise bugs.
         self.penetration = penetration
-        # stats class eventually?
-        # for stat in stats print stat
-        self.current_round = 0
-        self.wrong_bs = 0
-        self.num_hits = 0
-        self.num_stand = 0
-        self.num_double = 0
-        self.num_split = 0
-        self.num_surrender = 0
 
 
 class Model:
@@ -74,17 +66,20 @@ def find_best_move(count, player_hand, dealer_hand):
     return best_move
 
 
-def handle_dealer_turn(dealer, game):
+def handle_dealer_turn(dealer, rules):
     while True:
         dealer_hand_val = dealer.hand.get_value()
 
         if dealer_hand_val == -1 or dealer_hand_val == 21:
             return dealer_hand_val
 
+        # print("debug")
+        # print(rules.dealer_hit_soft_17)
+        # print(dealer_hand_val == 17)
+        # print(dealer.hand.is_soft())
+        # print("debug end")
         if dealer_hand_val <= 16 or (
-            game.dealer_hit_soft17
-            and dealer_hand_val == 17
-            and dealer.hand.cards.is_soft()
+            rules.dealer_hit_soft_17 and dealer_hand_val == 17 and dealer.hand.is_soft()
         ):
             dealer.hand.hit(dealer)
         else:
@@ -134,7 +129,7 @@ def print_stats(player, model, time_played):
 
 
 def evaluate_player_hand(
-    hand, player_hand_val, dealer_hand_val, dealer_natural_21, player, game
+    hand, player_hand_val, dealer_hand_val, dealer_natural_21, player, rules
 ):
     if (
         player_hand_val == -1
@@ -147,7 +142,7 @@ def evaluate_player_hand(
         if dealer_natural_21:
             player.bankroll += hand.current_bet
         else:
-            player.bankroll += hand.current_bet * (1 + game.blackjack_payout)
+            player.bankroll += hand.current_bet * (1 + rules.blackjack_payout)
 
     elif dealer_hand_val < player_hand_val <= 21:
         player.bankroll += hand.current_bet * 2
@@ -160,20 +155,20 @@ def main():
     model = Model(
         starting_amount=0, rounds_to_be_played=1000000, min_bet=10, is_manual=False
     )
-    game = Game(
+    rules = Rules(
         blackjack_payout=1.5,
-        dealer_hit_soft17=False,
+        dealer_hit_soft_17=False,
         surrender=True,
         insurance=True,
         number_of_decks=4,
-        # Needs to be at a point where the dealer won't run out of cards. Otherwise bugs.
         penetration=0.75,
     )
 
-    dealer = Dealer(number_of_decks=game.number_of_decks)
+    dealer = Dealer(number_of_decks=rules.number_of_decks)
     player = Player(starting_amount=model.starting_amount, base_bet=model.min_bet)
 
-    while game.current_round < model.rounds_to_be_played:
+    current_round = 0
+    while current_round < model.rounds_to_be_played:
 
         player.place_bet(
             amount=player.determine_bet(dealer.shoe.get_true_count()),
@@ -189,23 +184,23 @@ def main():
         if dealer.hand.get_value() == 21:
             continue
 
-        dealer_hand_val = handle_dealer_turn(dealer, game)
+        dealer_hand_val = handle_dealer_turn(dealer, rules)
         dealer_natural_21 = dealer.hand.is_natural_21()
         for hand in player.hands:
             player_hand_val = handle_player_hand_turn(model, dealer, hand)
             evaluate_player_hand(
-                hand, player_hand_val, dealer_hand_val, dealer_natural_21, player, game
+                hand, player_hand_val, dealer_hand_val, dealer_natural_21, player, rules
             )
 
         player.clear_hand()
         dealer.clear_hand()
 
-        if len(dealer.shoe.cards) / (game.number_of_decks * 52) < (
-            1 - game.penetration
+        if len(dealer.shoe.cards) / (rules.number_of_decks * 52) < (
+            1 - rules.penetration
         ):
             dealer.new_shoe()
 
-        game.current_round += 1
+        current_round += 1
 
     print_stats(player, model, time_played=round(time.time() - start, 4))
 
