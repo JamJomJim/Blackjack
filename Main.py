@@ -95,39 +95,37 @@ def handle_dealer_turn(dealer, game):
             return
 
 
-def handle_player_hand_turn(model, game, dealer, hand):
-    hand_done = False
-    while not hand_done and not hand.has_split_aces:
+def handle_player_hand_turn(model, dealer, hand):
+    while not hand.has_split_aces:
         player_hand_val = hand.get_value()
-        if player_hand_val == 21:
-            hand_done = True
-        elif player_hand_val == -1 or player_hand_val > 21:
-            hand_done = True
-        else:
-            if model.is_manual:
-                move = input("What do you want to do?\n")
-            else:
-                move = find_best_move(
-                    dealer.shoe.true_count,
-                    player_hand=hand,
-                    dealer_hand=dealer.hand,
-                )
 
-            if move == Move.STAND.value:
-                game.num_stand += 1
-                hand_done = True
-            elif move == Move.HIT.value:
-                hand.hit(dealer)
-            elif move == Move.SPLIT.value and hand.is_splittable():
-                hand.split(dealer=dealer, model=model)
-            elif move == Move.DOUBLE.value:
-                hand.double(dealer=dealer, model=model)
-                hand_done = True
-            elif move == Move.SURRENDER.value:
-                hand.surrender(game)
-                hand_done = True
-            else:
-                raise ValueError("An invalid move was made.")
+        if player_hand_val == -1 or player_hand_val >= 21:
+            return
+
+        if model.is_manual:
+            move = input("What do you want to do?\n")
+        else:
+            move = find_best_move(
+                dealer.shoe.true_count,
+                player_hand=hand,
+                dealer_hand=dealer.hand,
+            )
+
+        if move == Move.STAND.value:
+            hand.stand()
+            return
+        elif move == Move.HIT.value:
+            hand.hit(dealer)
+        elif move == Move.SPLIT.value:
+            hand.split(dealer=dealer, model=model)
+        elif move == Move.DOUBLE.value:
+            hand.double(dealer=dealer, model=model)
+            return
+        elif move == Move.SURRENDER.value:
+            hand.surrender()
+            return
+        else:
+            raise ValueError("An invalid move was made.")
 
 
 def print_stats(player, model, time_played):
@@ -172,7 +170,7 @@ def main():
 
         # Player's turn
         for hand in player.hands:
-            handle_player_hand_turn(model, game, dealer, hand)
+            handle_player_hand_turn(model, dealer, hand)
 
         # Dealer's turn
         handle_dealer_turn(dealer, game)

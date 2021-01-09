@@ -69,8 +69,7 @@ class Hand:
 
         self.owner.hands.append(new_hand)
 
-    def surrender(self, game):
-        game.num_surrender += 1
+    def surrender(self):
         self.owner.bankroll += self.current_bet / 2
         self.has_surrendered = True
 
