@@ -77,6 +77,59 @@ def find_best_move(count, player_hand, dealer_hand):
     return best_move
 
 
+def handle_dealer_turn(dealer, game):
+    while True:
+        dealer_hand_val = dealer.hand.get_value()
+
+        if dealer_hand_val == -1 or dealer_hand_val == 21:
+            return
+
+        if dealer_hand_val <= 16 or (
+            game.dealer_hit_soft17
+            and dealer_hand_val == 17
+            and dealer.hand.cards.is_soft()
+        ):
+            dealer.hand.hit(dealer)
+        else:
+            dealer.hand.stand()
+            return
+
+
+def handle_player_hand_turn(model, game, dealer, hand):
+    hand_done = False
+    while not hand_done and not hand.has_split_aces:
+        player_hand_val = hand.get_value()
+        if player_hand_val == 21:
+            hand_done = True
+        elif player_hand_val == -1 or player_hand_val > 21:
+            hand_done = True
+        else:
+            if model.is_manual:
+                move = input("What do you want to do?\n")
+            else:
+                move = find_best_move(
+                    dealer.shoe.true_count,
+                    player_hand=hand,
+                    dealer_hand=dealer.hand,
+                )
+
+            if move == Move.STAND.value:
+                game.num_stand += 1
+                hand_done = True
+            elif move == Move.HIT.value:
+                hand.hit(dealer)
+            elif move == Move.SPLIT.value and hand.is_splittable():
+                hand.split(dealer=dealer, model=model)
+            elif move == Move.DOUBLE.value:
+                hand.double(dealer=dealer, model=model)
+                hand_done = True
+            elif move == Move.SURRENDER.value:
+                hand.surrender(game)
+                hand_done = True
+            else:
+                raise ValueError("An invalid move was made.")
+
+
 def print_stats(player, model, time_played):
     print(f"\nEnded with ${str(player.bankroll)} dollars")
     print(model.total_bet)
@@ -87,7 +140,7 @@ def print_stats(player, model, time_played):
 def main():
     start = time.time()
     model = Model(
-        starting_amount=0, rounds_to_be_played=1000000, min_bet=10, is_manual=False
+        starting_amount=0, rounds_to_be_played=100000, min_bet=10, is_manual=False
     )
     game = Game(
         blackjack_payout=1.5,
@@ -119,65 +172,10 @@ def main():
 
         # Player's turn
         for hand in player.hands:
-            hand_done = False
-            while not hand_done and not hand.has_split_aces:
-                player_hand_val = hand.get_value()
-                if player_hand_val == 21:
-                    hand_done = True
-                elif player_hand_val == -1 or player_hand_val > 21:
-                    hand_done = True
-                else:
-                    if model.is_manual:
-                        move = input("What do you want to do?\n")
-                    else:
-                        move = find_best_move(
-                            dealer.shoe.true_count,
-                            player_hand=hand,
-                            dealer_hand=dealer.hand,
-                        )
-
-                    if move == Move.STAND.value:
-                        game.num_stand += 1
-                        hand_done = True
-                    elif move == Move.HIT.value:
-                        hand.hit(dealer)
-                    elif move == Move.SPLIT.value and hand.is_splittable():
-                        hand.split(dealer=dealer, model=model)
-                    elif move == Move.DOUBLE.value:
-                        hand.double(dealer=dealer, model=model)
-                        hand_done = True
-                    elif move == Move.SURRENDER.value:
-                        hand.surrender(game)
-                        hand_done = True
-                    else:
-                        raise ValueError("An invalid move was made.")
+            handle_player_hand_turn(model, game, dealer, hand)
 
         # Dealer's turn
-        dealer_done = False
-        while not dealer_done:
-            dealer_hand_val = dealer.hand.get_value()
-
-            if dealer_hand_val == 21:
-                dealer_done = True
-            elif dealer_hand_val == -1:
-                dealer_done = True
-            else:
-                if (
-                    game.dealer_hit_soft17
-                    and dealer_hand_val == 17
-                    and dealer.hand.cards.is_soft()
-                ):
-                    move = Move.HIT.value
-                elif dealer_hand_val <= 16:
-                    move = Move.HIT.value
-                else:
-                    move = Move.STAND.value
-
-                if move == Move.STAND.value:
-                    dealer.hand.stand()
-                    dealer_done = True
-                else:
-                    dealer.hand.hit(dealer)
+        handle_dealer_turn(dealer, game)
 
         for hand in player.hands:
             player_hand_val = hand.get_value()
@@ -198,8 +196,6 @@ def main():
             else:
                 player.bankroll += hand.current_bet
 
-                # print("Push\n")
-
         player.clear_hand()
         dealer.clear_hand()
 
@@ -211,7 +207,6 @@ def main():
         game.current_round += 1
 
     print_stats(player, model, time_played=round(time.time() - start, 4))
-    return player.bankroll
 
 
 if __name__ == "__main__":
