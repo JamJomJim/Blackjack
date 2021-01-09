@@ -79,7 +79,7 @@ def handle_dealer_turn(dealer, game):
         dealer_hand_val = dealer.hand.get_value()
 
         if dealer_hand_val == -1 or dealer_hand_val == 21:
-            return
+            return dealer_hand_val
 
         if dealer_hand_val <= 16 or (
             game.dealer_hit_soft17
@@ -89,7 +89,7 @@ def handle_dealer_turn(dealer, game):
             dealer.hand.hit(dealer)
         else:
             dealer.hand.stand()
-            return
+            return dealer_hand_val
 
 
 def handle_player_hand_turn(model, dealer, hand):
@@ -97,7 +97,7 @@ def handle_player_hand_turn(model, dealer, hand):
         player_hand_val = hand.get_value()
 
         if player_hand_val == -1 or player_hand_val >= 21:
-            return
+            return player_hand_val
 
         if model.is_manual:
             move = input("What do you want to do?\n")
@@ -110,19 +110,20 @@ def handle_player_hand_turn(model, dealer, hand):
 
         if move == "stand":
             hand.stand()
-            return
+            return player_hand_val
         elif move == "hit":
             hand.hit(dealer)
         elif move == "split":
             hand.split(dealer=dealer, model=model)
         elif move == "double":
             hand.double(dealer=dealer, model=model)
-            return
+            return player_hand_val
         elif move == "surrender":
             hand.surrender()
-            return
+            return player_hand_val
         else:
             raise ValueError("An invalid move was made.")
+    return hand.get_value()
 
 
 def print_stats(player, model, time_played):
@@ -132,9 +133,9 @@ def print_stats(player, model, time_played):
     print(f"{str(model.rounds_to_be_played)} hands in {str(time_played)} seconds!")
 
 
-def evaluate_player_hand(hand, dealer_hand_val, dealer_natural_21, player, game):
-    player_hand_val = hand.get_value()
-
+def evaluate_player_hand(
+    hand, player_hand_val, dealer_hand_val, dealer_natural_21, player, game
+):
     if (
         player_hand_val == -1
         or 21 >= dealer_hand_val > player_hand_val
@@ -188,13 +189,13 @@ def main():
         if dealer.hand.get_value() == 21:
             continue
 
-        handle_dealer_turn(dealer, game)
-
-        dealer_hand_val = dealer.hand.get_value()
+        dealer_hand_val = handle_dealer_turn(dealer, game)
         dealer_natural_21 = dealer.hand.is_natural_21()
         for hand in player.hands:
-            handle_player_hand_turn(model, dealer, hand)
-            evaluate_player_hand(hand, dealer_hand_val, dealer_natural_21, player, game)
+            player_hand_val = handle_player_hand_turn(model, dealer, hand)
+            evaluate_player_hand(
+                hand, player_hand_val, dealer_hand_val, dealer_natural_21, player, game
+            )
 
         player.clear_hand()
         dealer.clear_hand()
