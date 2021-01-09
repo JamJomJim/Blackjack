@@ -5,7 +5,6 @@ from basic_strategy.soft_hand_strategy import soft_hand_strategy
 from basic_strategy.splitting_hand_strategy import splitting_hand_strategy
 from Dealer import Dealer
 from Player import Player
-from ValidMovesEnum import Move
 
 
 class Game:
@@ -60,7 +59,7 @@ def find_best_move(count, player_hand, dealer_hand):
             - 9
         )
         if splitting_hand_strategy[current_count][p_index][d_index] == "Y":
-            return Move.SPLIT.value
+            return "split"
 
     p_index = abs(player_hand.get_value() - 20)
     if player_hand.is_soft():
@@ -69,10 +68,8 @@ def find_best_move(count, player_hand, dealer_hand):
     else:
         best_move = hard_hand_strategy[current_count][p_index][d_index]
 
-    if best_move == Move.DOUBLE.value and (
-        len(player_hand.cards) > 2 or player_hand.has_split
-    ):
-        best_move = Move.HIT.value
+    if best_move == "double" and (len(player_hand.cards) > 2 or player_hand.has_split):
+        best_move = "hit"
 
     return best_move
 
@@ -111,17 +108,17 @@ def handle_player_hand_turn(model, dealer, hand):
                 dealer_hand=dealer.hand,
             )
 
-        if move == Move.STAND.value:
+        if move == "stand":
             hand.stand()
             return
-        elif move == Move.HIT.value:
+        elif move == "hit":
             hand.hit(dealer)
-        elif move == Move.SPLIT.value:
+        elif move == "split":
             hand.split(dealer=dealer, model=model)
-        elif move == Move.DOUBLE.value:
+        elif move == "double":
             hand.double(dealer=dealer, model=model)
             return
-        elif move == Move.SURRENDER.value:
+        elif move == "surrender":
             hand.surrender()
             return
         else:

@@ -3,7 +3,6 @@ import unittest
 from Card import Card
 from Hand import Hand
 from Main import find_best_move
-from ValidMovesEnum import Move
 
 
 class TestFindBestMove(unittest.TestCase):
@@ -29,15 +28,15 @@ class TestFindBestMove(unittest.TestCase):
     def test_find_best_move(self):
         self.assertEqual(
             find_best_move(count=0, player_hand=self.soft_13, dealer_hand=self.soft_16),
-            Move.HIT.value,
+            "hit",
         )
         self.assertEqual(
             find_best_move(count=0, player_hand=self.hard_17, dealer_hand=self.soft_16),
-            Move.STAND.value,
+            "stand",
         )
         self.assertEqual(
             find_best_move(count=0, player_hand=self.ace_pair, dealer_hand=self.hard_9),
-            Move.SPLIT.value,
+            "split",
         )
 
 
