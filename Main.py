@@ -106,7 +106,7 @@ def handle_player_hand_turn(model, dealer, hand):
             move = input("What do you want to do?\n")
         else:
             move = find_best_move(
-                dealer.shoe.true_count,
+                dealer.shoe.get_true_count(),
                 player_hand=hand,
                 dealer_hand=dealer.hand,
             )
@@ -154,8 +154,9 @@ def main():
     player = Player(starting_amount=model.starting_amount, base_bet=model.min_bet)
 
     while game.current_round < model.rounds_to_be_played:
+
         player.place_bet(
-            amount=player.determine_bet(dealer.shoe.true_count),
+            amount=player.determine_bet(dealer.shoe.get_true_count()),
             hand=player.hands[0],
             model=model,
         )
