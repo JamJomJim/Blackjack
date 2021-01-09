@@ -158,7 +158,7 @@ def evaluate_player_hand(
 def main():
     start = time.time()
     model = Model(
-        starting_amount=0, rounds_to_be_played=100000, min_bet=10, is_manual=False
+        starting_amount=0, rounds_to_be_played=1000000, min_bet=10, is_manual=False
     )
     game = Game(
         blackjack_payout=1.5,
