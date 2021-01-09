@@ -177,15 +177,17 @@ def main():
             player_hand_val = hand.get_value()
             dealer_hand_val = dealer.hand.get_value()
 
-            if hand.has_surrendered:
-                continue
-            elif 21 >= dealer_hand_val > player_hand_val or player_hand_val == -1:
+            if (
+                player_hand_val == -1
+                or 21 >= dealer_hand_val > player_hand_val
+                or hand.has_surrendered
+            ):
                 continue
             elif hand.is_natural_21():
-                if not (dealer.hand.is_natural_21()):
-                    player.bankroll += hand.current_bet * (1 + game.blackjack_payout)
-                else:
+                if dealer.hand.is_natural_21():
                     player.bankroll += hand.current_bet
+                else:
+                    player.bankroll += hand.current_bet * (1 + game.blackjack_payout)
 
             elif dealer_hand_val < player_hand_val <= 21:
                 player.bankroll += hand.current_bet * 2
