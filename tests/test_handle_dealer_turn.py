@@ -42,6 +42,7 @@ class TestHandleDealerTurn(unittest.TestCase):
         self.assertEqual(self.dealer.hand.get_value(), 17)
         handle_dealer_turn(self.dealer, self.rules)
         self.assertEqual(self.dealer.hand.get_value(), 17)
+        self.assertEqual(len(self.dealer.hand.cards), 2)
 
     def test_dealer_hit_soft_17(self):
         self.rules.dealer_hit_soft_17 = True

@@ -27,12 +27,11 @@ class Rules:
 
 
 class Model:
-    def __init__(self, starting_amount, rounds_to_be_played, min_bet, is_manual):
+    def __init__(self, starting_amount, rounds_to_be_played, min_bet):
         self.starting_amount = starting_amount
         self.rounds_to_be_played = rounds_to_be_played
         self.min_bet = min_bet
         self.total_bet = 0
-        self.is_manual = is_manual
 
 
 def find_best_move(count, player_hand, dealer_hand):
@@ -73,11 +72,6 @@ def handle_dealer_turn(dealer, rules):
         if dealer_hand_val == -1 or dealer_hand_val == 21:
             return dealer_hand_val
 
-        # print("debug")
-        # print(rules.dealer_hit_soft_17)
-        # print(dealer_hand_val == 17)
-        # print(dealer.hand.is_soft())
-        # print("debug end")
         if dealer_hand_val <= 16 or (
             rules.dealer_hit_soft_17 and dealer_hand_val == 17 and dealer.hand.is_soft()
         ):
@@ -94,14 +88,11 @@ def handle_player_hand_turn(model, dealer, hand):
         if player_hand_val == -1 or player_hand_val >= 21:
             return player_hand_val
 
-        if model.is_manual:
-            move = input("What do you want to do?\n")
-        else:
-            move = find_best_move(
-                dealer.shoe.get_true_count(),
-                player_hand=hand,
-                dealer_hand=dealer.hand,
-            )
+        move = find_best_move(
+            dealer.shoe.get_true_count(),
+            player_hand=hand,
+            dealer_hand=dealer.hand,
+        )
 
         if move == "stand":
             hand.stand()
@@ -150,11 +141,24 @@ def evaluate_player_hand(
         player.bankroll += hand.current_bet
 
 
+def handle_game_logic(model, rules, dealer, player):
+    dealer_hand_val = handle_dealer_turn(dealer, rules)
+    dealer_natural_21 = dealer.hand.is_natural_21()
+    for hand in player.hands:
+        player_hand_val = handle_player_hand_turn(model, dealer, hand)
+        evaluate_player_hand(
+            hand, player_hand_val, dealer_hand_val, dealer_natural_21, player, rules
+        )
+
+
+def check_needs_new_shoe(rules, dealer):
+    if len(dealer.shoe.cards) / (rules.number_of_decks * 52) < (1 - rules.penetration):
+        dealer.new_shoe()
+
+
 def main():
     start = time.time()
-    model = Model(
-        starting_amount=0, rounds_to_be_played=1000000, min_bet=10, is_manual=False
-    )
+    model = Model(starting_amount=0, rounds_to_be_played=10000, min_bet=10)
     rules = Rules(
         blackjack_payout=1.5,
         dealer_hit_soft_17=False,
@@ -169,7 +173,6 @@ def main():
 
     current_round = 0
     while current_round < model.rounds_to_be_played:
-
         player.place_bet(
             amount=player.determine_bet(dealer.shoe.get_true_count()),
             hand=player.hands[0],
@@ -179,26 +182,12 @@ def main():
         dealer.deal(hand=player.hands[0], number_cards=2)
         dealer.deal(hand=dealer.hand, number_cards=2)
 
-        # Checks for dealer blackjack
-        # Verify these rules
-        if dealer.hand.get_value() == 21:
-            continue
-
-        dealer_hand_val = handle_dealer_turn(dealer, rules)
-        dealer_natural_21 = dealer.hand.is_natural_21()
-        for hand in player.hands:
-            player_hand_val = handle_player_hand_turn(model, dealer, hand)
-            evaluate_player_hand(
-                hand, player_hand_val, dealer_hand_val, dealer_natural_21, player, rules
-            )
+        handle_game_logic(model, rules, dealer, player)
 
         player.clear_hand()
         dealer.clear_hand()
 
-        if len(dealer.shoe.cards) / (rules.number_of_decks * 52) < (
-            1 - rules.penetration
-        ):
-            dealer.new_shoe()
+        check_needs_new_shoe(rules, dealer)
 
         current_round += 1
 
