@@ -5,33 +5,43 @@ from basic_strategy.soft_hand_strategy import soft_hand_strategy
 from basic_strategy.splitting_hand_strategy import splitting_hand_strategy
 from Dealer import Dealer
 from Player import Player
+from ValidMovesEnum import Move
 
 
-class Rules:
+class Game:
     def __init__(
         self,
         blackjack_payout,
-        dealer_hit_soft_17,
+        dealer_hit_soft17,
         surrender,
         insurance,
         number_of_decks,
         penetration,
     ):
         self.blackjack_payout = blackjack_payout
-        self.dealer_hit_soft_17 = dealer_hit_soft_17
+        self.dealer_hit_soft17 = dealer_hit_soft17
         self.surrender = surrender
         self.insurance = insurance
         self.number_of_decks = number_of_decks
-        # Needs to be at a point where the dealer won't run out of cards. Otherwise bugs.
         self.penetration = penetration
+        # stats class eventually?
+        # for stat in stats print stat
+        self.current_round = 0
+        self.wrong_bs = 0
+        self.num_hits = 0
+        self.num_stand = 0
+        self.num_double = 0
+        self.num_split = 0
+        self.num_surrender = 0
 
 
 class Model:
-    def __init__(self, starting_amount, rounds_to_be_played, min_bet):
+    def __init__(self, starting_amount, rounds_to_be_played, min_bet, is_manual):
         self.starting_amount = starting_amount
         self.rounds_to_be_played = rounds_to_be_played
         self.min_bet = min_bet
         self.total_bet = 0
+        self.is_manual = is_manual
 
 
 def find_best_move(count, player_hand, dealer_hand):
@@ -50,7 +60,7 @@ def find_best_move(count, player_hand, dealer_hand):
             - 9
         )
         if splitting_hand_strategy[current_count][p_index][d_index] == "Y":
-            return "split"
+            return Move.SPLIT.value
 
     p_index = abs(player_hand.get_value() - 20)
     if player_hand.is_soft():
@@ -59,57 +69,65 @@ def find_best_move(count, player_hand, dealer_hand):
     else:
         best_move = hard_hand_strategy[current_count][p_index][d_index]
 
-    if best_move == "double" and (len(player_hand.cards) > 2 or player_hand.has_split):
-        best_move = "hit"
+    if best_move == Move.DOUBLE.value and (
+        len(player_hand.cards) > 2 or player_hand.has_split
+    ):
+        best_move = Move.HIT.value
 
     return best_move
 
 
-def handle_dealer_turn(dealer, rules):
+def handle_dealer_turn(dealer, game):
     while True:
         dealer_hand_val = dealer.hand.get_value()
 
         if dealer_hand_val == -1 or dealer_hand_val == 21:
-            return dealer_hand_val
+            return
 
         if dealer_hand_val <= 16 or (
-            rules.dealer_hit_soft_17 and dealer_hand_val == 17 and dealer.hand.is_soft()
+            game.dealer_hit_soft17
+            and dealer_hand_val == 17
+            and dealer.hand.cards.is_soft()
         ):
             dealer.hand.hit(dealer)
         else:
             dealer.hand.stand()
-            return dealer_hand_val
+            return
 
 
-def handle_player_hand_turn(model, dealer, hand):
-    while not hand.has_split_aces:
+def handle_player_hand_turn(model, game, dealer, hand):
+    hand_done = False
+    while not hand_done and not hand.has_split_aces:
         player_hand_val = hand.get_value()
-
-        if player_hand_val == -1 or player_hand_val >= 21:
-            return player_hand_val
-
-        move = find_best_move(
-            dealer.shoe.get_true_count(),
-            player_hand=hand,
-            dealer_hand=dealer.hand,
-        )
-
-        if move == "stand":
-            hand.stand()
-            return player_hand_val
-        elif move == "hit":
-            hand.hit(dealer)
-        elif move == "split":
-            hand.split(dealer=dealer, model=model)
-        elif move == "double":
-            hand.double(dealer=dealer, model=model)
-            return player_hand_val
-        elif move == "surrender":
-            hand.surrender()
-            return player_hand_val
+        if player_hand_val == 21:
+            hand_done = True
+        elif player_hand_val == -1 or player_hand_val > 21:
+            hand_done = True
         else:
-            raise ValueError("An invalid move was made.")
-    return hand.get_value()
+            if model.is_manual:
+                move = input("What do you want to do?\n")
+            else:
+                move = find_best_move(
+                    dealer.shoe.get_true_count(),
+                    player_hand=hand,
+                    dealer_hand=dealer.hand,
+                )
+
+            if move == Move.STAND.value:
+                game.num_stand += 1
+                hand_done = True
+            elif move == Move.HIT.value:
+                hand.hit(dealer)
+            elif move == Move.SPLIT.value and hand.is_splittable():
+                hand.split(dealer=dealer, model=model)
+            elif move == Move.DOUBLE.value:
+                hand.double(dealer=dealer, model=model)
+                hand_done = True
+            elif move == Move.SURRENDER.value:
+                hand.surrender()
+                hand_done = True
+            else:
+                raise ValueError("An invalid move was made.")
 
 
 def print_stats(player, model, time_played):
@@ -119,60 +137,25 @@ def print_stats(player, model, time_played):
     print(f"{str(model.rounds_to_be_played)} hands in {str(time_played)} seconds!")
 
 
-def evaluate_player_hand(
-    hand, player_hand_val, dealer_hand_val, dealer_natural_21, player, rules
-):
-    if (
-        player_hand_val == -1
-        or 21 >= dealer_hand_val > player_hand_val
-        or hand.has_surrendered
-    ):
-        return
-
-    if hand.is_natural_21():
-        if dealer_natural_21:
-            player.bankroll += hand.current_bet
-        else:
-            player.bankroll += hand.current_bet * (1 + rules.blackjack_payout)
-
-    elif dealer_hand_val < player_hand_val <= 21:
-        player.bankroll += hand.current_bet * 2
-    else:
-        player.bankroll += hand.current_bet
-
-
-def handle_game_logic(model, rules, dealer, player):
-    dealer_hand_val = handle_dealer_turn(dealer, rules)
-    dealer_natural_21 = dealer.hand.is_natural_21()
-    for hand in player.hands:
-        player_hand_val = handle_player_hand_turn(model, dealer, hand)
-        evaluate_player_hand(
-            hand, player_hand_val, dealer_hand_val, dealer_natural_21, player, rules
-        )
-
-
-def check_needs_new_shoe(rules, dealer):
-    if len(dealer.shoe.cards) / (rules.number_of_decks * 52) < (1 - rules.penetration):
-        dealer.new_shoe()
-
-
 def main():
     start = time.time()
-    model = Model(starting_amount=0, rounds_to_be_played=10000, min_bet=10)
-    rules = Rules(
+    model = Model(
+        starting_amount=0, rounds_to_be_played=10000, min_bet=10, is_manual=False
+    )
+    game = Game(
         blackjack_payout=1.5,
-        dealer_hit_soft_17=False,
+        dealer_hit_soft17=False,
         surrender=True,
         insurance=True,
         number_of_decks=4,
+        # Needs to be at a point where the dealer won't run out of cards. Otherwise bugs.
         penetration=0.75,
     )
 
-    dealer = Dealer(number_of_decks=rules.number_of_decks)
+    dealer = Dealer(number_of_decks=game.number_of_decks)
     player = Player(starting_amount=model.starting_amount, base_bet=model.min_bet)
 
-    current_round = 0
-    while current_round < model.rounds_to_be_played:
+    while game.current_round < model.rounds_to_be_played:
         player.place_bet(
             amount=player.determine_bet(dealer.shoe.get_true_count()),
             hand=player.hands[0],
@@ -182,14 +165,46 @@ def main():
         dealer.deal(hand=player.hands[0], number_cards=2)
         dealer.deal(hand=dealer.hand, number_cards=2)
 
-        handle_game_logic(model, rules, dealer, player)
+        # Checks for dealer blackjack
+        # Verify these rules
+        if dealer.hand.get_value() == 21:
+            continue
+
+        # Player's turn
+        for hand in player.hands:
+            handle_player_hand_turn(model, game, dealer, hand)
+
+        # Dealer's turn
+        handle_dealer_turn(dealer, game)
+
+        for hand in player.hands:
+            player_hand_val = hand.get_value()
+            dealer_hand_val = dealer.hand.get_value()
+
+            if hand.has_surrendered:
+                continue
+            elif 21 >= dealer_hand_val > player_hand_val or player_hand_val == -1:
+                continue
+            elif hand.is_natural_21():
+                if not (dealer.hand.is_natural_21()):
+                    player.bankroll += hand.current_bet * (1 + game.blackjack_payout)
+                else:
+                    player.bankroll += hand.current_bet
+
+            elif dealer_hand_val < player_hand_val <= 21:
+                player.bankroll += hand.current_bet * 2
+            else:
+                player.bankroll += hand.current_bet
 
         player.clear_hand()
         dealer.clear_hand()
 
-        check_needs_new_shoe(rules, dealer)
+        if len(dealer.shoe.cards) / (game.number_of_decks * 52) < (
+            1 - game.penetration
+        ):
+            dealer.new_shoe()
 
-        current_round += 1
+        game.current_round += 1
 
     print_stats(player, model, time_played=round(time.time() - start, 4))
 
