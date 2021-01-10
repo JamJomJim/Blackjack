@@ -86,7 +86,7 @@ def handle_player_hand_turn(model, dealer, hand):
         player_hand_val = hand.get_value()
 
         if player_hand_val == -1 or player_hand_val >= 21:
-            return player_hand_val
+            return
 
         move = find_best_move(
             dealer.shoe.get_true_count(),
@@ -96,20 +96,19 @@ def handle_player_hand_turn(model, dealer, hand):
 
         if move == "stand":
             hand.stand()
-            return player_hand_val
+            return
         elif move == "hit":
             hand.hit(dealer)
         elif move == "split":
             hand.split(dealer=dealer, model=model)
         elif move == "double":
             hand.double(dealer=dealer, model=model)
-            return player_hand_val
+            return
         elif move == "surrender":
             hand.surrender()
-            return player_hand_val
+            return
         else:
             raise ValueError("An invalid move was made.")
-    return hand.get_value()
 
 
 def print_stats(player, model, time_played):
@@ -119,9 +118,8 @@ def print_stats(player, model, time_played):
     print(f"{str(model.rounds_to_be_played)} hands in {str(time_played)} seconds!")
 
 
-def evaluate_player_hand(
-    hand, player_hand_val, dealer_hand_val, dealer_natural_21, player, rules
-):
+def evaluate_player_hand(hand, dealer_hand_val, dealer_natural_21, player, rules):
+    player_hand_val = hand.get_value()
     if (
         player_hand_val == -1
         or 21 >= dealer_hand_val > player_hand_val
@@ -145,10 +143,8 @@ def handle_game_logic(model, rules, dealer, player):
     dealer_hand_val = handle_dealer_turn(dealer, rules)
     dealer_natural_21 = dealer.hand.is_natural_21()
     for hand in player.hands:
-        player_hand_val = handle_player_hand_turn(model, dealer, hand)
-        evaluate_player_hand(
-            hand, player_hand_val, dealer_hand_val, dealer_natural_21, player, rules
-        )
+        handle_player_hand_turn(model, dealer, hand)
+        evaluate_player_hand(hand, dealer_hand_val, dealer_natural_21, player, rules)
 
 
 def check_needs_new_shoe(rules, dealer):
