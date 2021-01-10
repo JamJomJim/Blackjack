@@ -37,6 +37,36 @@ class TestHandleGameLogic(unittest.TestCase):
         handle_game_logic(self.model, self.rules, self.dealer, self.player)
         self.assertEqual(self.player.bankroll, 10)
 
+    def test_player_double_down(self):
+        self.player.place_bet(
+            amount=self.player.determine_bet(self.dealer.shoe.get_true_count()),
+            hand=self.player.hands[0],
+            model=self.model,
+        )
+        self.dealer.hand.cards = [
+            Card("spades", 10),
+            Card("spades", 10),
+            Card("spades", 10),
+        ]
+        self.player.hands[0].cards = [Card("spades", 6), Card("spades", 5)]
+        handle_game_logic(self.model, self.rules, self.dealer, self.player)
+        self.assertGreaterEqual(self.player.bankroll, 20)
+
+    def test_player_split_aces(self):
+        self.player.place_bet(
+            amount=self.player.determine_bet(self.dealer.shoe.get_true_count()),
+            hand=self.player.hands[0],
+            model=self.model,
+        )
+        self.dealer.hand.cards = [
+            Card("spades", 10),
+            Card("spades", 10),
+            Card("spades", 10),
+        ]
+        self.player.hands[0].cards = [Card("spades", "ace"), Card("spades", "ace")]
+        handle_game_logic(self.model, self.rules, self.dealer, self.player)
+        self.assertGreaterEqual(self.player.bankroll, 20)
+
     def test_both_natural_blackjack(self):
         self.player.place_bet(
             amount=self.player.determine_bet(self.dealer.shoe.get_true_count()),
